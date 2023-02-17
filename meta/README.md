@@ -34,6 +34,12 @@ Install all npm packages
 
 ### AWS Advanced Configuration Required
 
+### `aws --version`
+
+can you verify correct version of aws
+aws-cli/1.22.34 Python/3.10.6 Linux/5.15.0-60-generic botocore/1.23.34
+
+
 ### `aws configure --profile aida`
 
 ### Project Deployment
