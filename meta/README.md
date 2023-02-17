@@ -42,6 +42,8 @@ aws-cli/1.22.34 Python/3.10.6 Linux/5.15.0-60-generic botocore/1.23.34
 
 ### `aws configure --profile aida`
 
+can you verify correct region of us-east-1
+
 ### Project Deployment
 
 ### `serverless deploy --verbose --aws-profile aida2`
