@@ -38,4 +38,8 @@ Builds the app for production to the `build` folder.
 
 After successful build, go inside build folder
 
-Copy all the files, add permission 'PublicRead' and upload it in Amazon S3 bucket: aida-develop-front and Set permissions: 
+Upload all the files inside the build folder to AWS S3 bucket: aida-develop-front by setting Permissions as "Grant public-read access".
+
+Go to AWS CloudFront. Search for 'aida-develop-front'. Open the 'aida-develop-front' distribution. Go to Invalidations tab and Create invalidation by adding "/*" in object paths.
+
+After that, you can use https://{CloudFrontDistributionDomainName} link to access the login page of the Front end application.
