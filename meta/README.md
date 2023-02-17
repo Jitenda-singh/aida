@@ -46,7 +46,7 @@ can you verify correct region of us-east-1
 
 ### Project Deployment
 
-### `serverless deploy --verbose --aws-profile aida2`
+### `serverless deploy --verbose --aws-profile aida`
 
 After completion of deployment, Copy the following credentials from terminal:
 
