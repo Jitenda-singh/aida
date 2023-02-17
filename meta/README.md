@@ -1,21 +1,23 @@
 ## Available Scripts
 
-In the project directory, you can run:
+In the project directory, you can run following commands:
 
 ### `nvm -v`
 
 can you verify correct version of nvm
-0.39.1
+0.39.1 otherwise Install nvm for windows: https://github.com/coreybutler/nvm-windows/releases
 
 ### `node -v`
 
 can you verify correct version of node
-v16.15.0
+v16.15.0 otherwise Install node for windows: https://nodejs.org/en/download/releases/
 
 ### `npm -v`
 
 can you verify correct version of npm
 8.5.5
+
+Install serverless for windows
 
 ### `npm install -g serverless`
 
@@ -24,14 +26,34 @@ can you verify correct version of npm
 can you verify correct version of serverless
 Framework Core: 3.27.0
 
-### `npm i serverless-bundle`
+Install all npm packages 
 
-### `npm i`
+### `npm install serverless-bundle`
 
-### Advanced Configuration
+### `npm install`
+
+### AWS Advanced Configuration Required
 
 ### `aws configure --profile aida`
 
-### Deployment
+### Project Deployment
 
 ### `serverless deploy --verbose --aws-profile aida2`
+
+After completion of deployment, Copy the following credentials from terminal:
+
+### AppClientId
+### CognitoDomain
+### Region
+### UserPoolID
+### ServiceEndpoint
+### CloudFrontDistributionDomainName
+
+and add these credentials into frontend app directory: aidafront -> .env file as given below:
+
+### REACT_APP_COGNITO_APP_CLIENT_ID=AppClientId
+### REACT_APP_COGNITO_DOMAIN=CognitoDomain
+### REACT_APP_COGNITO_REGION=Region
+### REACT_APP_COGNITO_USER_POOL_ID=UserPoolID
+### REACT_APP_API_URL=ServiceEndpoint
+### REACT_APP_API_REDIRECT_URL=CloudFrontDistributionDomainName
