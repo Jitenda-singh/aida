@@ -1,0 +1,124 @@
+Resources:
+  # Creates a user pool in cognito for the app to auth against
+  userPool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      UserPoolName: "${self:provider.projectName}-${self:provider.stage}"
+      UsernameConfiguration:
+        CaseSensitive: false
+      UserPoolAddOns:
+        AdvancedSecurityMode: AUDIT
+      AutoVerifiedAttributes:
+        - email
+      VerificationMessageTemplate:
+        EmailSubject: AIDA Verification Code
+        EmailMessage: Your verification code is {####}.
+      DeviceConfiguration:
+        ChallengeRequiredOnNewDevice: true
+      EmailConfiguration:
+        EmailSendingAccount: COGNITO_DEFAULT
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+        InviteMessageTemplate:
+          # SMSMessage: enter the message you want to send. must contain- {username}, {####}.
+          EmailSubject: Your temporary password
+          EmailMessage: Your username is {username} and temporary password is {####}.
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: firstname
+          AttributeDataType: String
+          Mutable: true
+        - Name: lastname
+          AttributeDataType: String
+          Mutable: true
+        - Name: phone
+          AttributeDataType: String
+          Mutable: true
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+
+  # Creates a User Pool Client to be used by the identity pool
+  userPoolClient:
+    Type: "AWS::Cognito::UserPoolClient"
+    Properties:
+      ClientName: !Sub ${self:provider.projectName}-${self:provider.stage}-aidaAppClient
+      GenerateSecret: false
+      UserPoolId: !Ref userPool
+      EnableTokenRevocation: true
+      SupportedIdentityProviders:
+        - COGNITO
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      AllowedOAuthScopes:
+        - phone
+        - email
+        - openid
+        - profile
+        - aws.cognito.signin.user.admin
+      CallbackURLs:
+        - !Join ['', ['https://', !GetAtt CloudFrontDistribution.DomainName, '/welcome']]
+      # CallbackURLs:
+      #   - http://localhost:3000/welcome
+  
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      UserPoolId: !Ref userPool
+      Domain: !Sub ${self:provider.projectName}-${self:provider.stage}
+
+  # Creates user groups in user pool
+  CognitoUserPoolAdminGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      Description: "AIDA admin group"
+      GroupName: !Sub ${self:provider.projectName}-${self:provider.stage}-admin-group
+      UserPoolId: !Ref userPool
+
+  # Creates user groups in user pool
+  CognitoUserPoolUserGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      Description: "AIDA user group"
+      GroupName: !Sub ${self:provider.projectName}-${self:provider.stage}-user-group
+      UserPoolId: !Ref userPool
+
+Outputs:
+  UserPoolID:
+    Description: Provider Cognito User Pool Id
+    Value: !Ref userPool
+    Export:
+      Name:
+        Fn::Join:
+          - ""
+          - - Fn::Sub: ${self:provider.projectName}
+            - "-"
+            - Fn::Sub: ${self:provider.stage}
+            - -poolId
+  AppClientId:
+    Description: App Pool Id
+    Value: !Ref userPoolClient
+  CognitoDomain:
+    Description: Cognito Domain
+    Value:
+      Fn::Join:
+        - "."
+        - - !Ref UserPoolDomain
+          - "auth"
+          - Fn::Sub: ${self:provider.region}
+          - "amazoncognito.com"
+  Region:
+    Description: Cognito Region
+    Value:
+      Fn::Join:
+        - ""
+        - - Fn::Sub: ${self:provider.region}
+          - ""

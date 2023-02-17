@@ -1,0 +1,60 @@
+# NOTE: update this with your service name
+service: aida-0-x-meta
+
+# Create an optimized package for our functions
+package:
+  individually: true
+  exclude:
+    - ${self:provider.frontendDirectoryName}/node_modules/**
+    - ${self:provider.frontendDirectoryName}/public/**
+    - ${self:provider.frontendDirectoryName}/src/**
+    - ${self:provider.frontendDirectoryName}/package.json
+    - ${self:provider.frontendDirectoryName}/package-lock.json
+    - ${self:provider.frontendDirectoryName}/README.md
+    - node_modules/**
+    - amplify/**
+    - public/**
+    - src/**
+    - yarn.lock
+
+plugins:
+  # - serverless-s3-sync
+  - serverless-bundle
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  projectName: aida
+  frontendDirectoryName: aidafront
+  stage: develop
+  region: us-east-1
+  environment:
+    PROJECT_NAME: ${self:provider.projectName}
+    STAGE: ${self:provider.stage}
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'lambda:*'
+        - 'cognito:*'
+        - 'cognito-idp:*'
+        - 'apigateway:*'
+        - 's3:*'
+        - 'cloudfront:*'
+      Resource:
+        - '*'
+
+# custom:
+#   s3Sync:
+#     - bucketName: ${self:provider.projectName}-${self:provider.stage}-front
+#       localDir: ${self:provider.frontendDirectoryName}/build/
+
+resources:
+  # building cognito
+  - ${file(cognitoUserPool.yml)}
+  # building authorizer
+  - ${file(apiGatewayAuthorizer.yml)}
+  # app deployment s3 bucket
+  - ${file(appDeployment.yml)}
+
+functions: ${file(api.yml)}
+

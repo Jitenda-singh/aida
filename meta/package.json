@@ -1,0 +1,12 @@
+{
+  "devDependencies": {
+    "serverless-s3-sync": "^2.0.0"
+  },
+  "dependencies": {
+    "aws-amplify": "^5.0.14",
+    "aws-amplify-serverless-plugin": "^1.4.1",
+    "jwt-decode": "^3.1.2",
+    "lodash": "^4.17.21",
+    "serverless-bundle": "^6.0.0"
+  }
+}

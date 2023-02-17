@@ -1,0 +1,18 @@
+Resources:
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: restApi
+
+  # Creates api gateway endpoints
+  ApiGatewayAuthorizer:
+    DependsOn:
+      - ApiGatewayRestApi
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: cognito-authorizer
+      IdentitySource: method.request.header.Authorization
+      RestApiId: !Ref ApiGatewayRestApi
+      Type: COGNITO_USER_POOLS
+      ProviderARNs:
+        - Fn::GetAtt: [userPool, Arn]
