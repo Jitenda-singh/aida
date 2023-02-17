@@ -38,7 +38,7 @@ Builds the app for production to the `build` folder.
 
 After successful build, go inside build folder
 
-Upload all the files inside the build folder to AWS S3 bucket "aida-develop-front" by setting Permissions as "Grant public-read access".
+Go to AWS S3. Search for 'aida-develop-front' bucket. Upload all the files inside the build folder to 'aida-develop-front' bucket by setting Permissions as "Grant public-read access".
 
 Go to AWS CloudFront. Search for 'aida-develop-front'. Open the 'aida-develop-front' distribution. Go to Invalidations tab and Create invalidation by adding "/*" in object paths.
 
