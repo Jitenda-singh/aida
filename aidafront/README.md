@@ -32,10 +32,6 @@ Add these credentials into .env file as given below after serverless deploy:
 ### REACT_APP_API_URL=ServiceEndpoint
 ### REACT_APP_API_REDIRECT_URL=CloudFrontDistributionDomainName
 
-### `npm start`
-
-Runs the app in the development mode.
-
 ### `npm run build`
 
 Builds the app for production to the `build` folder.
