@@ -48,7 +48,7 @@ can you verify correct region of us-east-1
 
 ### `serverless deploy --verbose --aws-profile aida`
 
-After completion of deployment, Copy the following credentials from terminal:
+After completion of deployment, Copy the following settings from terminal:
 
 ### AppClientId
 ### CognitoDomain
@@ -57,7 +57,7 @@ After completion of deployment, Copy the following credentials from terminal:
 ### ServiceEndpoint
 ### CloudFrontDistributionDomainName
 
-and add these credentials into frontend app directory: aidafront -> .env file as given below:
+Update the settings in the .env file of the front end with appropriate values from the deployment outputs.
 
 ### REACT_APP_COGNITO_APP_CLIENT_ID=AppClientId
 ### REACT_APP_COGNITO_DOMAIN=CognitoDomain
