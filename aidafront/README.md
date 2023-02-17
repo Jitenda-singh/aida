@@ -30,7 +30,7 @@ Add these credentials into .env file as given below after serverless deploy:
 ### REACT_APP_COGNITO_REGION=Region
 ### REACT_APP_COGNITO_USER_POOL_ID=UserPoolID
 ### REACT_APP_API_URL=ServiceEndpoint
-### REACT_APP_API_REDIRECT_URL=CloudFrontDistributionDomainName
+### REACT_APP_API_REDIRECT_URL=https://CloudFrontDistributionDomainName
 
 ### `npm run build`
 
