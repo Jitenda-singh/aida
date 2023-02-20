@@ -12,7 +12,8 @@ function Button(props) {
       fontSize: "16px",
       margin: "4px 2px",
       cursor: "pointer",
-      backgroundColor: "blue"
+      borderRadius: "4px",
+      backgroundColor: "#3f51b5"
     }}>
       {props.text}
     </button>
