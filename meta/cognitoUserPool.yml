@@ -66,8 +66,8 @@ Resources:
         - aws.cognito.signin.user.admin
       CallbackURLs:
         - !Join ['', ['https://', !GetAtt CloudFrontDistribution.DomainName, '/welcome']]
-      # CallbackURLs:
-      #   - http://localhost:3000/welcome
+      LogoutURLs: 
+        - !Join ['', ['https://', !GetAtt CloudFrontDistribution.DomainName, '/sign-out']]
   
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
