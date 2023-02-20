@@ -1,6 +1,7 @@
 const urlConstants = {
   getCognitoOauth2Token: '/oauth2/token',
   getUser: '/user',
-  welcome: '/welcome'
+  welcome: '/welcome',
+  signOut: '/sign-out'
 }
 export default urlConstants

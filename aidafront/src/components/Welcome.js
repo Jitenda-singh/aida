@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react'
 import urlConstants from '../constants/urlConstants';
 import { get } from '../utils/httpHelper'
 import { getToken } from '../utils/authHelper'
+import Button from './Button';
 
 function Welcome(props) {
   const [userInfo, setUserInfo] = useState()
@@ -31,6 +32,11 @@ function Welcome(props) {
         {userInfo['cognito:username'] && <div>User Name:{userInfo['cognito:username']}</div>}
         {userInfo['email'] && <div>Email:{userInfo['email']}</div>}
         {userInfo['cognito:groups'] && <div>Groups:{userInfo['cognito:groups']}</div>}
+        <div>
+          <a href={`https://${process.env.REACT_APP_COGNITO_DOMAIN}/logout?client_id=${process.env.REACT_APP_COGNITO_APP_CLIENT_ID}&logout_uri=${process.env.REACT_APP_API_REDIRECT_URL + urlConstants.signOut}`}>
+            <Button text={"Logout"} />
+          </a>
+        </div>
       </div>
       : <div>Loading...</div>
   )
