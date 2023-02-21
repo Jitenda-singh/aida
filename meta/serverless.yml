@@ -33,19 +33,9 @@ provider:
     PROJECT_NAME: ${self:provider.projectName}
     STAGE: ${self:provider.stage}
   iamRoleStatements:
-    - Effect: Allow #allow apigateway
-      Action: "lambda:Invoke"
-      Resource: !Sub arn:aws:lambda:${self:provider.region}:${AWS::AccountId}:function:${AWS::StackName}-*
-    - Effect: 'Allow'
-      Action:
-        # - 'lambda:*'
-        - 'cognito:*'
-        - 'cognito-idp:*'
-        - 'apigateway:*'
-        - 's3:*'
-        - 'cloudfront:*'
-      Resource:
-        - '*'
+    - Effect: Allow
+      Action: "cognito-idp:*"
+      Resource: !Sub arn:aws:cognito-idp:${self:provider.region}:${AWS::AccountId}:userpool/${userPool}
 
 custom:
   outputToEnv:
