@@ -18,8 +18,9 @@ package:
     - yarn.lock
 
 plugins:
-  # - serverless-s3-sync
   - serverless-bundle
+  - serverless-output-to-env
+  - serverless-s3-sync
 
 provider:
   name: aws
@@ -32,9 +33,12 @@ provider:
     PROJECT_NAME: ${self:provider.projectName}
     STAGE: ${self:provider.stage}
   iamRoleStatements:
+    - Effect: Allow #allow apigateway
+      Action: "lambda:Invoke"
+      Resource: !Sub arn:aws:lambda:${self:provider.region}:${AWS::AccountId}:function:${AWS::StackName}-*
     - Effect: 'Allow'
       Action:
-        - 'lambda:*'
+        # - 'lambda:*'
         - 'cognito:*'
         - 'cognito-idp:*'
         - 'apigateway:*'
@@ -43,10 +47,20 @@ provider:
       Resource:
         - '*'
 
-# custom:
-#   s3Sync:
-#     - bucketName: ${self:provider.projectName}-${self:provider.stage}-front
-#       localDir: ${self:provider.frontendDirectoryName}/build/
+custom:
+  outputToEnv:
+    fileName: ../${self:provider.frontendDirectoryName}/.env
+    map:
+      REACT_APP_COGNITO_APP_CLIENT_ID: AppClientId
+      REACT_APP_COGNITO_DOMAIN: CognitoDomain
+      REACT_APP_COGNITO_REGION: Region
+      REACT_APP_COGNITO_USER_POOL_ID: UserPoolID
+      REACT_APP_API_URL: ServiceEndpoint
+      REACT_APP_API_REDIRECT_URL: CloudFrontDistributionDomainName
+  s3Sync:
+    - bucketName: ${self:provider.projectName}-${self:provider.stage}-front
+      localDir: ../${self:provider.frontendDirectoryName}/build/
+      acl: public-read # optional
 
 resources:
   # building cognito
