@@ -27,18 +27,18 @@ function Welcome(props) {
   })
   return (
     userInfo
-      ? <div style={{display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", marginTop: "30px"}}>
-        <div>Hi <span style={{textTransform: "capitalize"}}>{userInfo['cognito:username']}</span></div>
-        {userInfo['cognito:username'] && <div style={{margin: "20px 0 4px 0"}}>User Name:&nbsp;<span style={{textTransform: "capitalize"}}>{userInfo['cognito:username']}</span></div>}
-        {userInfo['email'] && <div style={{margin: "4px 0"}}>Email:&nbsp;<span>{userInfo['email']}</span></div>}
-        {userInfo['cognito:groups'] && <div style={{margin: "4px 0"}}>Groups:&nbsp;<span>{userInfo['cognito:groups']}</span></div>}
-        <div style={{margin: "20px 0"}}>
+      ? <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", marginTop: "30px" }}>
+        <div>Hi <span style={{ textTransform: "capitalize" }}>{`${userInfo['given_name']} ${userInfo['family_name']}`}</span></div>
+        {userInfo['cognito:username'] && <div style={{ margin: "20px 0 4px 0" }}>Name:&nbsp;<span style={{ textTransform: "capitalize" }}>{`${userInfo['given_name']} ${userInfo['family_name']}`}</span></div>}
+        {userInfo['email'] && <div style={{ margin: "4px 0" }}>Email:&nbsp;<span>{userInfo['email']}</span></div>}
+        {userInfo['cognito:groups'] && <div style={{ margin: "4px 0" }}>Groups:&nbsp;<span>{userInfo['cognito:groups']}</span></div>}
+        <div style={{ margin: "20px 0" }}>
           <a href={`https://${process.env.REACT_APP_COGNITO_DOMAIN}/logout?client_id=${process.env.REACT_APP_COGNITO_APP_CLIENT_ID}&logout_uri=${process.env.REACT_APP_API_REDIRECT_URL + urlConstants.signOut}`}>
             <Button text={"Sign out"} />
           </a>
         </div>
       </div>
-      : <div style={{display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", marginTop: "20px"}}>Loading...</div>
+      : <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", marginTop: "20px" }}>Loading...</div>
   )
 }
 
