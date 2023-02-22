@@ -8,6 +8,8 @@ Resources:
         CaseSensitive: false
       UserPoolAddOns:
         AdvancedSecurityMode: AUDIT
+      UsernameAttributes:
+        - email
       AutoVerifiedAttributes:
         - email
       VerificationMessageTemplate:
@@ -28,15 +30,18 @@ Resources:
           AttributeDataType: String
           Mutable: true
           Required: true
-        - Name: firstname
+        - Name: given_name
           AttributeDataType: String
           Mutable: true
-        - Name: lastname
+          Required: true
+        - Name: family_name
           AttributeDataType: String
           Mutable: true
-        - Name: phone
+          Required: true
+        - Name: phone_number
           AttributeDataType: String
           Mutable: true
+          Required: true
       Policies:
         PasswordPolicy:
           MinimumLength: 8
