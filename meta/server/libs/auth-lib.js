@@ -7,6 +7,8 @@ export const getClaims = function (event) {
     if (event && event.requestContext && event.requestContext.authorizer && event.requestContext.authorizer.claims) {
       const data = _.cloneDeep(jwt_decode(event.headers.Authorization));
       claimClone['cognito:username'] = data['cognito:username'];
+      claimClone['given_name'] = data['given_name'];
+      claimClone['family_name'] = data['family_name'];
       claimClone['email'] = data.email;
       if (data && data['cognito:groups']) {
         claimClone['cognito:groups'] = data['cognito:groups'];
