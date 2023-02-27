@@ -6,5 +6,7 @@
 # production
 */build
 
+*.webpack
+
 # Serverless directories
 *.serverless

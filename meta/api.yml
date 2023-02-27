@@ -13,6 +13,20 @@ user:
           type: "COGNITO_USER_POOLS"
           authorizerId:
             Ref: ApiGatewayAuthorizer
+# api to createOrUpdateCompany
+createOrUpdateCompany:
+  handler: server/api/company/createOrUpdateCompany.handler
+  events:
+    - http:
+        path: /company
+        method: put
+        cors:
+          origin: '*'
+          maxAge: 86400
+        authorizer:
+          type: "COGNITO_USER_POOLS"
+          authorizerId:
+            Ref: ApiGatewayAuthorizer
 
 postConfirmation:
   handler: server/cognito_triggers/postConfirmation.trigger

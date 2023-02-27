@@ -18,6 +18,7 @@ package:
     - yarn.lock
 
 plugins:
+  - serverless-offline
   - serverless-bundle
   - serverless-output-to-env
   - serverless-s3-sync
@@ -36,6 +37,12 @@ provider:
     - Effect: Allow
       Action: "cognito-idp:*"
       Resource: !Sub arn:aws:cognito-idp:${self:provider.region}:${AWS::AccountId}:userpool/${userPool}
+    - Effect: Allow
+      Action: "dynamodb:UpdateItem"
+      Resource: !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${DataTable}
+    - Effect: Allow
+      Action: "dynamodb:PutItem"
+      Resource: !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${DataTable}
 
 custom:
   outputToEnv:
@@ -57,6 +64,8 @@ resources:
   - ${file(cognitoUserPool.yml)}
   # building authorizer
   - ${file(apiGatewayAuthorizer.yml)}
+  # table deployment dynamodb
+  - ${file(table.yml)}
   # app deployment s3 bucket
   - ${file(appDeployment.yml)}
 
