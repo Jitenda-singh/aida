@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { put } from '../../utils/httpHelper'
 import RegisterUpdate from '../shared/RegisterUpdate'
 
 function Camera() {
@@ -60,12 +61,20 @@ function Camera() {
       key: 'streamId'
     }
   ])
+  const onSave = async (postBody) => {
+    let response = await put("/camera", postBody)
+    if (response && response.cameraId && response.cameraName)
+      return { cameraId: response.cameraId, cameraName: response.cameraName }
+    else
+      throw new Error(`Failed to ${postBody.body.action}`)
+  }
   return (
     <RegisterUpdate
       createHeaderText={'Register New Camera'}
       updateHeaderText={'Update Camera'}
       createFields={createCameraFields}
       updateFields={updateCameraFields}
+      onSave={onSave}
     />
   )
 

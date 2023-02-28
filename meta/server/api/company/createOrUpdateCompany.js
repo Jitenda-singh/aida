@@ -36,17 +36,19 @@ const createCompany = async (postData, tableName) => {
   )) {
     throw new Error("Required fields is missing");
   }
+  const companyId = uuidV4();
   const expressionAttributeValues = {
+    ":companyId": companyId,
     ":companyName": postData.companyName,
     ":mainContactUserIds": postData.mainContactUserIds
   };
   const key = {
     "PK": "COM#",
-    "SK": "COM#" + uuidV4(),
+    "SK": "COM#" + companyId,
   };
-  const updateExpression = "Set companyName =:companyName, mainContactUserIds =:mainContactUserIds";
+  const updateExpression = "Set companyId=:companyId, companyName =:companyName, mainContactUserIds =:mainContactUserIds";
   const createCompanyParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, "", "UPDATED_NEW");
-  await call('update', createCompanyParams);
+  return await call('update', createCompanyParams);
 };
 
 const updateCompany = async (postData, tableName) => {
@@ -58,6 +60,7 @@ const updateCompany = async (postData, tableName) => {
     throw new Error("Required fields is missing");
   }
   const expressionAttributeValues = {
+    ":companyId": postData.companyId,
     ":companyName": postData.companyName,
     ":mainContactUserIds": postData.mainContactUserIds
   };
@@ -65,8 +68,8 @@ const updateCompany = async (postData, tableName) => {
     "PK": "COM#",
     "SK": "COM#" + postData.companyId,
   };
-  const updateExpression = "Set companyName =:companyName, mainContactUserIds =:mainContactUserIds";
+  const updateExpression = "Set companyId=:companyId, companyName =:companyName, mainContactUserIds =:mainContactUserIds";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateCompanyParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
-  await call('update', updateCompanyParams);
+  return await call('update', updateCompanyParams);
 };

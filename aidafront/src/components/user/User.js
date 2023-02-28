@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import RegisterUpdate from '../shared/RegisterUpdate'
+import { put } from '../../utils/httpHelper'
 
 function User() {
   const [createUserFields, setCreateUserFields] = useState([
@@ -60,12 +61,20 @@ function User() {
       key: 'phone'
     }
   ])
+  const onSave = async (postBody) => {
+    let response = await put("/users", postBody)
+    if (response && response.userId && response.firstName && response.lastName)
+      return { userId: response.userId, name: response.firstName + " " + response.lastName }
+    else
+      throw new Error(`Failed to ${postBody.body.action}`)
+  }
   return (
     <RegisterUpdate
       createHeaderText={'Register New User'}
       updateHeaderText={'Update User'}
       createFields={createUserFields}
       updateFields={updateUserFields}
+      onSave={onSave}
     />
   )
 }

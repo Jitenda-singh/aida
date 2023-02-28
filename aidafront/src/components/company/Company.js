@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { put } from '../../utils/httpHelper'
 import RegisterUpdate from '../shared/RegisterUpdate'
 
 function Company() {
@@ -31,17 +32,26 @@ function Company() {
     },
     {
       id: '2',
-      placeholder: 'Add one or more contact user id *',
+      placeholder: 'Add one or more main contact user id *',
       type: 'textField',
       key: 'mainContactUserIds'
     }
   ])
+  const onSave = async (postBody) => {
+    let response = await put("/company", postBody)
+    if (response && response.companyId && response.companyName)
+      return { companyId: response.companyId, name: response.companyName }
+    else
+      throw new Error(`Failed to ${postBody.body.action}`)
+  }
   return (
     <RegisterUpdate
       createHeaderText={'Register New Company'}
       updateHeaderText={'Update Company'}
       createFields={createCompanyFields}
       updateFields={updateCompanyFields}
+      onSave={onSave}
+      company={true}
     />
   )
 }

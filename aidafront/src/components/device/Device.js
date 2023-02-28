@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { put } from '../../utils/httpHelper'
 import RegisterUpdate from '../shared/RegisterUpdate'
 
 function Device() {
@@ -24,12 +25,20 @@ function Device() {
       key: 'deviceName'
     },
   ])
+  const onSave = async (postBody) => {
+    let response = await put("/device", postBody)
+    if (response && response.deviceId && response.deviceName)
+      return { deviceId: response.deviceId, deviceName: response.deviceName }
+    else
+      throw new Error(`Failed to ${postBody.body.action}`)
+  }
   return (
     <RegisterUpdate
       createHeaderText={'Register New Device'}
       updateHeaderText={'Update Device'}
       createFields={createDeviceFields}
       updateFields={updateDeviceFields}
+      onSave={onSave}
     />
   )
 

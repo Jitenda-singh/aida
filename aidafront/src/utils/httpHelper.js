@@ -56,16 +56,16 @@ export const get = async (uri, init) => {
   }
 }
 
-export const post = async (uri, postBody) => {
-  try {
-    const response = await API.post(
-      constants.AIDA_API,
-      uri,
-      postBody
-    )
-    return response
-  } catch (e) {
-    // await helper.handleUnauthorizedError(e)
-    throw e
-  }
-}
+// export const post = async (uri, postBody) => {
+//   try {
+//     const response = await API.post(
+//       constants.AIDA_API,
+//       uri,
+//       postBody
+//     )
+//     return response
+//   } catch (e) {
+//     // await helper.handleUnauthorizedError(e)
+//     throw e
+//   }
+// }

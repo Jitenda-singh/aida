@@ -6,13 +6,12 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { makeStyles } from '@mui/styles'
+import { UserListDisplay } from './UserListDisplay'
 const Loading = React.lazy(() => import('./Loading'))
 const CustomTextField = React.lazy(() => import('./customTextField'))
-const CustomAutocomplete = React.lazy(() => import('./customAutocomplete'))
 const CustomSecondaryButton = React.lazy(() => import('./customSecondaryButton'))
 const CustomPrimaryButton = React.lazy(() => import('./customPrimaryButton'))
 const CustomCloseIconButton = React.lazy(() => import('./customCloseIconButton'))
-const CustomSnackbar = React.lazy(() => import('./customSnackbar'))
 
 const useStyles = makeStyles((theme) => ({
   dialog: {
@@ -68,30 +67,35 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-function CustomDialog (props) {
+function CustomDialog(props) {
   const classes = useStyles(props)
-  const { handleClose, isSure, title, isDisabledClose, fields, message, primaryButtonText, secondaryButtonText, onSubmit, waitingForAPI, onChange, snackbarOpen, snackbarMessage, snackbarType, onCloseSnackbar, open } = props
+  const { handleClose, isSure, title, isDisabledClose, fields, message, primaryButtonText, secondaryButtonText, onSubmit, waitingForAPI, onChange, open, mainContactUserIdsList } = props
   return (
     <Dialog open={open} onClose={handleClose} className={classes.dialog}>
       <Suspense fallback={<Loading />}>
-      <DialogTitle className={`${isSure ? 'font-family-bold-20' : 'font-family-semi-bold-20'}`}>
-        <span className={classes.titleText}>{title}</span>
-        {!isDisabledClose && <CustomCloseIconButton onClick={handleClose} disabled={waitingForAPI} />}
-      </DialogTitle>
-      <DialogContent>
-        {fields && fields.length > 0 && fields.map((item, index) => <div key={index} className={classes.inputAlign}>
-          {item.type === 'autoCompleteTextField' ? item.disabled ? <CustomAutocomplete id={`${index}-${item.key && props[item.key] && props[item.key].name}`} {...item} valueTitle={(item.key && props[item.key] && props[item.key].name)} options={(item.key && props[`${item.key}s`]) || item.options} onChangeCallback={(value) => onChange(item.key, value)} /> : <CustomAutocomplete id={`${index}-${item.key && props[item.key] && props[item.key].name}`} {...item} valueTitle={(item.key && props[item.key] && props[item.key].name)} options={(item.key && props[`${item.key}s`]) || item.options} onChangeCallback={(value) => onChange(item.key, value)} /> : <CustomTextField {...item} value={item.key && props[item.key]} onChange={(event) => onChange(item.key, event.target.value)} />}
+        <DialogTitle className={`${isSure ? 'font-family-bold-20' : 'font-family-semi-bold-20'}`}>
+          <span className={classes.titleText}>{title}</span>
+          {!isDisabledClose && <CustomCloseIconButton onClick={handleClose} disabled={waitingForAPI} />}
+        </DialogTitle>
+        <DialogContent>
+          {fields && fields.length > 0 && fields.map((item, index) => <div key={index} className={classes.inputAlign}>
+            <CustomTextField {...item} value={item.key && props[item.key]} onChange={(event) => onChange(item.key, event.target.value)} onKeyPress={(event) => {
+              if (item.key === "mainContactUserIds")
+                props.onChange('addMainContactUserIds', event)
+            }} />
+            {
+              item.key === "mainContactUserIds" && mainContactUserIdsList && mainContactUserIdsList.length > 0 && <UserListDisplay onChange={onChange} mainContactUserIdsList={mainContactUserIdsList} />
+            }
           </div>
-        )}
-        {message && <h4 className={`${classes.message} font-family-semi-bold-20`}>
-        <span dangerouslySetInnerHTML={{ __html: message }} />
+          )}
+          {message && <h4 className={`${classes.message} font-family-semi-bold-20`}>
+            <span dangerouslySetInnerHTML={{ __html: message }} />
           </h4>}
-      </DialogContent>
-      <DialogActions>
-        <CustomPrimaryButton onClick={onSubmit} disabled={waitingForAPI} buttonText={primaryButtonText} />
-        <CustomSecondaryButton onClick={handleClose} disabled={waitingForAPI} buttonText={secondaryButtonText} />
-      </DialogActions>
-      {snackbarOpen && snackbarMessage && snackbarType && <CustomSnackbar open={snackbarOpen} onClose={onCloseSnackbar} message={snackbarMessage} type={snackbarType} />}
+        </DialogContent>
+        <DialogActions>
+          <CustomPrimaryButton onClick={onSubmit} disabled={waitingForAPI} buttonText={primaryButtonText} />
+          <CustomSecondaryButton onClick={handleClose} disabled={waitingForAPI} buttonText={secondaryButtonText} />
+        </DialogActions>
       </Suspense>
     </Dialog>
   )
@@ -110,10 +114,6 @@ CustomDialog.propTypes = {
   fields: PropTypes.any,
   primaryButtonText: PropTypes.any,
   onChange: PropTypes.any,
-  snackbarOpen: PropTypes.any,
-  snackbarMessage: PropTypes.any,
-  snackbarType: PropTypes.any,
-  onCloseSnackbar: PropTypes.any,
   secondaryButtonText: PropTypes.any,
   onSubmit: PropTypes.any
 }
