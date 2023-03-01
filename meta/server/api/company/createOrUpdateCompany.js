@@ -1,13 +1,12 @@
 import { success, failure } from "../../libs/response-lib";
-import { getClaims } from "../../libs/auth-lib";
+import { isAuthorizedUser } from "../../libs/auth-lib";
 import { v4 as uuidV4 } from 'uuid';
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
 export const handler = async (event, context, callback) => {
   try {
-    let claims = getClaims(event);
-    if (!(claims && Object.keys(claims) && Object.keys(claims).length > 0))
+    if (!isAuthorizedUser(event))
       return failure(httpConstants.STATUS_401, constants.DEFAULT_MESSAGE_UNAUTHORIZED_USER);
     const postData = JSON.parse(event.body);
     try {

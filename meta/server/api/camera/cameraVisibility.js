@@ -1,12 +1,11 @@
 import { success, failure } from "../../libs/response-lib";
-import { getClaims } from "../../libs/auth-lib";
+import { isAuthorizedUser } from "../../libs/auth-lib";
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
 export const handler = async (event, context, callback) => {
   try {
-    let claims = getClaims(event);
-    if (!(claims && Object.keys(claims) && Object.keys(claims).length > 0))
+    if (!isAuthorizedUser(event))
       return failure(httpConstants.STATUS_401, constants.DEFAULT_MESSAGE_UNAUTHORIZED_USER);
     const postData = JSON.parse(event.body);
     try {
@@ -36,13 +35,13 @@ const createCameraVisibility = async (postData, tableName) => {
   const expressionAttributeValues = {
     ":userId": postData.userId,
     ":cameraId": postData.cameraId,
-    ":GSI1PK": postData.cameraId,
-    ":GSI1SK": postData.userId
+    ":GSI1PK": "CAM#" + postData.cameraId,
+    ":GSI1SK": "USR#" + postData.userId
   };
   const updateExpression = "Set userId=:userId, cameraId =:cameraId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const key = {
-    "PK": "USR#"+postData.userId,
-    "SK": "CAM#"+postData.cameraId,
+    "PK": "USR#" + postData.userId,
+    "SK": "CAM#" + postData.cameraId,
   };
   const createCameraVisibilityParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, "", "ALL_NEW");
   return await call('update', createCameraVisibilityParams);

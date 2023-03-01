@@ -20,3 +20,8 @@ export const getClaims = function (event) {
     return claimClone;
   }
 };
+
+export const isAuthorizedUser = (event) => {
+  let claims = getClaims(event);
+  return (claims && Object.keys(claims) && Object.keys(claims).length > 0 && claims["cognito:groups"] && claims["cognito:groups"].includes(`${process.env.PROJECT_NAME}-${process.env.STAGE}-admin-group`));
+};
