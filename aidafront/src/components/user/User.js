@@ -24,7 +24,7 @@ function User() {
     },
     {
       id: '3',
-      placeholder: 'Phone number in this format: +91XXXXXXXXXX *',
+      placeholder: 'Phone number* in this format: +91XXXXXXXXXX',
       type: 'textField',
       key: 'phone'
     }
@@ -56,7 +56,7 @@ function User() {
     },
     {
       id: '4',
-      placeholder: 'Phone number in this format: +91XXXXXXXXXX *',
+      placeholder: 'Phone number* in this format: +91XXXXXXXXXX',
       type: 'textField',
       key: 'phone'
     }
