@@ -43,7 +43,8 @@ constants.HOME_TABS = [
 ]
 constants.ACTIONS={
   create: "create",
-  update: "update"
+  update: "update",
+  LOGOUT: 'logout'
 }
 constants.SUCCESS_MESSAGE= {
   TYPE: 'success'
