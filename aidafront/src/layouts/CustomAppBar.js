@@ -7,6 +7,10 @@ import IconButton from '@mui/material/IconButton'
 import { makeStyles } from '@mui/styles'
 // import { useSelector } from 'react-redux'
 import { Auth } from 'aws-amplify'
+import { useDispatch } from 'react-redux'
+import { setUser } from '../reducers/userReducer'
+import constants from '../constants/constants'
+
 // const CustomDialog = React.lazy(() => import('../components/customDialog'))
 
 const useStyles = makeStyles((theme) => ({
@@ -43,6 +47,7 @@ export default function CustomAppBar() {
   const [open, setOpen] = React.useState(false)
   // const headerTitle = Constants.LEFT_MENU.map((item) => locationPathName === item.path && item.headerTitle)
   const classes = useStyles()
+  const dispatch = useDispatch()
   return (
     <AppBar className={classes.toolbar} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
       <Toolbar className={classes.toolbar}>
@@ -59,10 +64,13 @@ export default function CustomAppBar() {
         <Typography variant="h1" component="div" className={`${classes.flexOne} ${classes.title}`}>
           {/* User */}
         </Typography>
-        <Button className={classes.signOut} onClick={() => Auth.signOut()}>
+        <Button className={classes.signOut} onClick={() => {
+          dispatch(setUser({ isAuthenticated: false, action: constants.ACTIONS.LOGOUT }))
+          Auth.signOut()
+        }}>
           Sign Out
         </Button>
       </Toolbar>
-    </AppBar>
+    </AppBar >
   )
 }
