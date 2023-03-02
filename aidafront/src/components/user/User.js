@@ -24,7 +24,7 @@ function User() {
     },
     {
       id: '3',
-      placeholder: 'Phone *',
+      placeholder: 'Phone * (with country code eg. +91XXXXXXXXXX)',
       type: 'textField',
       key: 'phone'
     }
