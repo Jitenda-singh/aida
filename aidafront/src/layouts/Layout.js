@@ -50,7 +50,8 @@ const useStyles = makeStyles((theme) => ({
 
 const Layout = () => {
   const classes = useStyles()
-  const isAuthenticated = useSelector((state) => state.user.isAuthenticated)
+  const { isAuthenticated, userData } = useSelector((state) => state.user)
+  const showSideBar = userData["cognito:groups"] && userData["cognito:groups"].length>0 && (userData["cognito:groups"][0] && userData["cognito:groups"][0].includes("admin-group"))
   return (
     <>
       <Box className={`${classes.layoutBox} ${isAuthenticated ? '' : classes.authLayoutBox}`}>
@@ -58,7 +59,7 @@ const Layout = () => {
           <CssBaseline />
           {isAuthenticated && <CustomAppBar />}
           {/* {isAuthenticated && <AuthHeader />} */}
-          {isAuthenticated && <ClippedDrawer />}
+          {isAuthenticated && showSideBar && <ClippedDrawer />}
           <Box component="main" className={`${isAuthenticated ? classes.main : classes.authMain}`}>
             <Container className={`${isAuthenticated ? classes.mainContainer : classes.authContainer}`}>
               <Outlet />

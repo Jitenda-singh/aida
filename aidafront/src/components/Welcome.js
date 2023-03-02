@@ -7,37 +7,12 @@ import { useSelector } from 'react-redux';
 
 
 function Welcome(props) {
-  const [userInfo, setUserInfo] = useState()
   const loadedRef = useRef(false)
   const navigate = useNavigate();
   // const classes = useStyles()
-  const {isAuthenticated, token} = useSelector((state) => state.user)
+  const {userData} = useSelector((state) => state.user)
+  const [userInfo, setUserInfo] = useState(userData)
 
-  const getData = useCallback(async () => {
-    if (isAuthenticated) {
-
-      // const token = token.signInUserSession.idToken.jwtToken
-      console.log("token==>", token, isAuthenticated)
-      const requestData = {
-        headers: {
-          Authorization: token.signInUserSession.idToken.jwtToken
-        }
-      }
-      const data = await API.get(constants.AIDA_API, '/user', requestData)
-      setUserInfo(data)
-      navigate("/welcome")
-      console.log("data: ", data)
-    } else {
-      navigate("/sign-out")
-    }
-  }, [navigate])
-
-  useEffect(() => {
-    if (!loadedRef.current) {
-      loadedRef.current = true
-      getData()
-    }
-  }, [])
   return (
     userInfo
       ? <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", marginTop: "30px" }}>

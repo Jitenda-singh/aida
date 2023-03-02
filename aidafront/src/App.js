@@ -7,17 +7,27 @@ import theme from './theme'
 import AppRouter from './AppRouter';
 import { useDispatch } from 'react-redux'
 import { setUser } from './reducers/userReducer'
+import { get } from './utils/httpHelper';
+import { API } from 'aws-amplify'
+import constants from './constants/constants';
+
 Amplify.configure(awsConfigJs)
 
 function App() {
   const dispatch = useDispatch()
   useEffect(() => {
-    Hub.listen('auth', ({ payload: { event, data } }) => {
+    Hub.listen('auth', async ({ payload: { event, data } }) => {
       console.log("hub==>", event, data)
       switch (event) {
         case 'signIn':
           console.log('sign in', event, data)
-          dispatch(setUser({ token: data, isAuthenticated: true }))
+          const requestData = {
+            headers: {
+              Authorization: data.signInUserSession.idToken.jwtToken
+            }
+          }
+          const userData = await API.get(constants.AIDA_API, '/user', requestData)
+          dispatch(setUser({ token: data, isAuthenticated: true, userData: userData }))
           break
         case 'signOut':
           console.log('sign out')
