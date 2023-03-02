@@ -1,4 +1,6 @@
-import axios from 'axios'
+// import axios from 'axios'
+import { API } from 'aws-amplify'
+import constants from '../constants/constants'
 
 export const getUri = (uri, params, queryParams) => {
   let newUri = uri
@@ -32,6 +34,38 @@ export const getUri = (uri, params, queryParams) => {
   return process.env.REACT_APP_API_URL + newUri
 }
 
-export const get = async (uri, params, queryParams, headers) => {
-  return await axios.get(getUri(uri, params, queryParams), headers)
+// export const get = async (uri, params, queryParams, headers) => {
+//   return await axios.get(getUri(uri, params, queryParams), headers)
+// }
+export const put = async (uri, postBody) => {
+  try {
+    const response = await API.put(constants.AIDA_API, uri, postBody)
+    return response
+  } catch (e) {
+    // await helper.handleUnauthorizedError(e)
+    throw e
+  }
 }
+export const get = async (uri, init) => {
+  try {
+    const response = await API.get(constants.AIDA_API, uri, init)
+    return response
+  } catch (e) {
+    // await helper.handleUnauthorizedError(e)
+    throw e
+  }
+}
+
+// export const post = async (uri, postBody) => {
+//   try {
+//     const response = await API.post(
+//       constants.AIDA_API,
+//       uri,
+//       postBody
+//     )
+//     return response
+//   } catch (e) {
+//     // await helper.handleUnauthorizedError(e)
+//     throw e
+//   }
+// }

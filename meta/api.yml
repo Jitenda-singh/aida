@@ -1,4 +1,3 @@
-
 # api to fetch user details
 user:
   handler: server/api/users/user.handler
@@ -7,7 +6,79 @@ user:
         path: /user
         method: get
         cors:
-          origin: '*'
+          origin: "*"
+          maxAge: 86400
+        authorizer:
+          type: "COGNITO_USER_POOLS"
+          authorizerId:
+            Ref: ApiGatewayAuthorizer
+createOrUpdateUsers:
+  handler: server/api/users/createOrUpdateUsers.handler
+  environment:
+    USER_POOL_ID: !ImportValue ${self:provider.projectName}-${self:provider.stage}-poolId
+    APP_CLIENT_ID: !Ref userPoolClient
+  events:
+    - http:
+        path: /users
+        method: put
+        cors:
+          origin: "*"
+          maxAge: 86400
+        authorizer:
+          type: "COGNITO_USER_POOLS"
+          authorizerId:
+            Ref: ApiGatewayAuthorizer
+# api to createOrUpdateCompany
+createOrUpdateCompany:
+  handler: server/api/company/createOrUpdateCompany.handler
+  events:
+    - http:
+        path: /company
+        method: put
+        cors:
+          origin: "*"
+          maxAge: 86400
+        authorizer:
+          type: "COGNITO_USER_POOLS"
+          authorizerId:
+            Ref: ApiGatewayAuthorizer
+# api to createOrUpdateDevice
+createOrUpdateDevice:
+  handler: server/api/device/createOrUpdateDevice.handler
+  events:
+    - http:
+        path: /device
+        method: put
+        cors:
+          origin: "*"
+          maxAge: 86400
+        authorizer:
+          type: "COGNITO_USER_POOLS"
+          authorizerId:
+            Ref: ApiGatewayAuthorizer
+# api to createOrUpdateCamera
+createOrUpdateCamera:
+  handler: server/api/camera/createOrUpdateCamera.handler
+  events:
+    - http:
+        path: /camera
+        method: put
+        cors:
+          origin: "*"
+          maxAge: 86400
+        authorizer:
+          type: "COGNITO_USER_POOLS"
+          authorizerId:
+            Ref: ApiGatewayAuthorizer
+# api to add cameraVisibility
+cameraVisibility:
+  handler: server/api/camera/cameraVisibility.handler
+  events:
+    - http:
+        path: /camera-visibility
+        method: put
+        cors:
+          origin: "*"
           maxAge: 86400
         authorizer:
           type: "COGNITO_USER_POOLS"
