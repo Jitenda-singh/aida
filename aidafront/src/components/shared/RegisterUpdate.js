@@ -80,10 +80,10 @@ function RegisterUpdate(props) {
           textToDisplay: `${textMessage}has been ${state.action}d successfully!`
         })
     } catch (err) {
-      console.log("Error", err)
+      // console.log("Error", err.response)
       setState({
-        ...state,
-        textToDisplay: `Failed to ${state.action}`
+        open: false,
+        textToDisplay: `Failed to ${state.action}. ${err.response && err.response.data ? err.response.data : ""}`
       })
     }
   }

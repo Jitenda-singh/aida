@@ -9,7 +9,7 @@ import Container from '@mui/material/Container'
 import ClippedDrawer from './ClippedDrawer'
 import { useSelector } from 'react-redux'
 const CustomAppBar = React.lazy(() => import('./CustomAppBar'))
-const AuthHeader = React.lazy(() => import('../components/shared/Header'))
+// const AuthHeader = React.lazy(() => import('../components/shared/Header'))
 
 const useStyles = makeStyles((theme) => ({
   layoutBox: {
@@ -57,7 +57,7 @@ const Layout = () => {
         <Box className={`${classes.displayFlex} ${isAuthenticated ? '' : classes.authLayoutSubBox}`}>
           <CssBaseline />
           {isAuthenticated && <CustomAppBar />}
-          {isAuthenticated && <AuthHeader />}
+          {/* {isAuthenticated && <AuthHeader />} */}
           {isAuthenticated && <ClippedDrawer />}
           <Box component="main" className={`${isAuthenticated ? classes.main : classes.authMain}`}>
             <Container className={`${isAuthenticated ? classes.mainContainer : classes.authContainer}`}>

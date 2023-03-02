@@ -1,4 +1,4 @@
-import { Chip } from "@mui/material"
+import Chip from "@mui/material/Chip"
 import { makeStyles } from "@mui/styles"
 import ClearIcon from '@mui/icons-material/Clear';
 const useStyles = makeStyles((theme) => ({

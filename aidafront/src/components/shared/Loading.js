@@ -15,14 +15,14 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-function Loading () {
+function Loading() {
   const classes = useStyles()
   return (
-     <Container className={classes.container}>
-       <h4 className='font-family-bold-24'>
-         Loading...
-       </h4>
-     </Container>
+    <Container className={classes.container}>
+      <h4 className='font-family-bold-24'>
+        Loading...
+      </h4>
+    </Container>
   )
 }
 
