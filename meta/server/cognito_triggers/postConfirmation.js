@@ -38,8 +38,8 @@ const addUserIntoUserTable = async (event) => {
     };
     let expressionAttributeNames = {};
     let key = {
-      "PK": "USR#" + event.userName,
-      "SK": "USR#" + event.userName,
+      "PK": constants.USER_HASH + event.userName,
+      "SK": constants.USER_HASH + event.userName,
     };
     let updateExpression = "Set userId =:userId, firstName =:firstName, lastName =:lastName, email =:email, phone =:phone";
     let conditionExp = "attribute_not_exists(PK) and attribute_not_exists(SK)";

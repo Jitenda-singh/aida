@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import RegisterUpdate from '../shared/RegisterUpdate'
-import { put } from '../../utils/httpHelper'
+import { post } from '../../utils/httpHelper'
 
 function User() {
   const [createUserFields, setCreateUserFields] = useState([
@@ -62,7 +62,7 @@ function User() {
     }
   ])
   const onSave = async (postBody) => {
-    let response = await put("/users", postBody)
+    let response = await post("/users", postBody)
     if (response && response.userId && response.firstName && response.lastName)
       return { userId: response.userId, name: response.firstName + " " + response.lastName }
     else

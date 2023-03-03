@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { put } from '../../utils/httpHelper'
+import { post } from '../../utils/httpHelper'
 import RegisterUpdate from '../shared/RegisterUpdate'
 
 function CameraVisibility() {
@@ -18,7 +18,7 @@ function CameraVisibility() {
     },
   ])
   const onSave = async (postBody) => {
-    let response = await put("/camera-visibility", postBody)
+    let response = await post("/camera-visibility", postBody)
     if (response && response.userId && response.cameraId)
       return { userId: response.userId, cameraId: response.cameraId }
     else

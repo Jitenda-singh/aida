@@ -37,18 +37,17 @@ export const getUri = (uri, params, queryParams) => {
 // export const get = async (uri, params, queryParams, headers) => {
 //   return await axios.get(getUri(uri, params, queryParams), headers)
 // }
-export const put = async (uri, postBody) => {
+export const post = async(uri, postBody)=>{
   try {
-    const response = await API.put(constants.AIDA_API, uri, postBody)
+    const response = await API.post(constants.REACT_APP_AIDA_API_NAME, uri, postBody)
     return response
   } catch (e) {
-    // await helper.handleUnauthorizedError(e)
     throw e
   }
 }
 export const get = async (uri, init) => {
   try {
-    const response = await API.get(constants.AIDA_API, uri, init)
+    const response = await API.get(constants.REACT_APP_AIDA_API_NAME, uri, init)
     return response
   } catch (e) {
     // await helper.handleUnauthorizedError(e)
@@ -56,16 +55,3 @@ export const get = async (uri, init) => {
   }
 }
 
-// export const post = async (uri, postBody) => {
-//   try {
-//     const response = await API.post(
-//       constants.AIDA_API,
-//       uri,
-//       postBody
-//     )
-//     return response
-//   } catch (e) {
-//     // await helper.handleUnauthorizedError(e)
-//     throw e
-//   }
-// }

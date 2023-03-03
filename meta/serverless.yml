@@ -41,7 +41,7 @@ provider:
       Action: "dynamodb:UpdateItem"
       Resource: !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${DataTable}
     - Effect: Allow
-      Action: "dynamodb:PutItem"
+      Action: "dynamodb:GetItem"
       Resource: !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${DataTable}
 
 custom:

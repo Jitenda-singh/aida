@@ -20,7 +20,7 @@ export default {
   API: {
     endpoints: [
       {
-        name: constants.AIDA_API,
+        name: constants.REACT_APP_AIDA_API_NAME,
         endpoint: process.env.REACT_APP_API_URL,
         region: process.env.REACT_APP_COGNITO_REGION,
         custom_header: async () => {

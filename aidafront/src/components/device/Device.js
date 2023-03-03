@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { put } from '../../utils/httpHelper'
+import { post } from '../../utils/httpHelper'
 import RegisterUpdate from '../shared/RegisterUpdate'
 
 function Device() {
@@ -9,6 +9,12 @@ function Device() {
       placeholder: 'Device Name*',
       type: 'textField',
       key: 'deviceName'
+    },
+    {
+      id: '1',
+      placeholder: 'Company Id*',
+      type: 'textField',
+      key: 'companyId'
     }
   ])
   const [updateDeviceFields, setUpdateDeviceFields] = useState([
@@ -24,9 +30,15 @@ function Device() {
       type: 'textField',
       key: 'deviceName'
     },
+    {
+      id: '2',
+      placeholder: 'Company Id*',
+      type: 'textField',
+      key: 'companyId'
+    }
   ])
   const onSave = async (postBody) => {
-    let response = await put("/device", postBody)
+    let response = await post("/device", postBody)
     if (response && response.deviceId && response.deviceName)
       return { deviceId: response.deviceId, deviceName: response.deviceName }
     else

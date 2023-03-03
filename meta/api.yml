@@ -20,7 +20,7 @@ createOrUpdateUsers:
   events:
     - http:
         path: /users
-        method: put
+        method: post
         cors:
           origin: "*"
           maxAge: 86400
@@ -34,7 +34,7 @@ createOrUpdateCompany:
   events:
     - http:
         path: /company
-        method: put
+        method: post
         cors:
           origin: "*"
           maxAge: 86400
@@ -48,7 +48,7 @@ createOrUpdateDevice:
   events:
     - http:
         path: /device
-        method: put
+        method: post
         cors:
           origin: "*"
           maxAge: 86400
@@ -62,7 +62,7 @@ createOrUpdateCamera:
   events:
     - http:
         path: /camera
-        method: put
+        method: post
         cors:
           origin: "*"
           maxAge: 86400
@@ -76,7 +76,7 @@ cameraVisibility:
   events:
     - http:
         path: /camera-visibility
-        method: put
+        method: post
         cors:
           origin: "*"
           maxAge: 86400

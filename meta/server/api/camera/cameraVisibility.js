@@ -35,13 +35,13 @@ const createCameraVisibility = async (postData, tableName) => {
   const expressionAttributeValues = {
     ":userId": postData.userId,
     ":cameraId": postData.cameraId,
-    ":GSI1PK": "CAM#" + postData.cameraId,
-    ":GSI1SK": "USR#" + postData.userId
+    ":GSI1PK": constants.CAMERA_HASH + postData.cameraId,
+    ":GSI1SK": constants.USER_HASH + postData.userId
   };
   const updateExpression = "Set userId=:userId, cameraId =:cameraId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const key = {
-    "PK": "USR#" + postData.userId,
-    "SK": "CAM#" + postData.cameraId,
+    "PK": constants.USER_HASH + postData.userId,
+    "SK": constants.CAMERA_HASH + postData.cameraId,
   };
   const createCameraVisibilityParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, "", "ALL_NEW");
   return await call('update', createCameraVisibilityParams);
