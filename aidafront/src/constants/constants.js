@@ -1,7 +1,7 @@
 const constants = {
 }
 constants.PROJECT_NAME = "AIDA"
-constants.AIDA_API = "aida_api"
+constants.REACT_APP_AIDA_API_NAME= "aida_api"
 constants.LEFT_MENU = [
   {
     id: 1,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { put } from '../../utils/httpHelper'
+import { post } from '../../utils/httpHelper'
 import RegisterUpdate from '../shared/RegisterUpdate'
 
 function Company() {
@@ -38,7 +38,7 @@ function Company() {
     }
   ])
   const onSave = async (postBody) => {
-    let response = await put("/company", postBody)
+    let response = await post("/company", postBody)
     if (response && response.companyId && response.companyName)
       return { companyId: response.companyId, name: response.companyName }
     else

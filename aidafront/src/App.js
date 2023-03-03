@@ -26,7 +26,7 @@ function App() {
               Authorization: data.signInUserSession.idToken.jwtToken
             }
           }
-          const userData = await API.get(constants.AIDA_API, '/user', requestData)
+          const userData = await API.get(constants.REACT_APP_AIDA_API_NAME, '/user', requestData)
           dispatch(setUser({ token: data, isAuthenticated: true, userData: userData }))
           break
         case 'signOut':

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { put } from '../../utils/httpHelper'
+import { post } from '../../utils/httpHelper'
 import RegisterUpdate from '../shared/RegisterUpdate'
 
 function Camera() {
@@ -50,7 +50,7 @@ function Camera() {
     }
   ])
   const onSave = async (postBody) => {
-    let response = await put("/camera", postBody)
+    let response = await post("/camera", postBody)
     if (response && response.cameraId && response.cameraName)
       return { cameraId: response.cameraId, cameraName: response.cameraName }
     else
