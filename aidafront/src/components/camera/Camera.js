@@ -12,18 +12,12 @@ function Camera() {
     },
     {
       id: '1',
-      placeholder: 'Company Id*',
-      type: 'textField',
-      key: 'companyId'
-    },
-    {
-      id: '2',
       placeholder: 'Camera Name *',
       type: 'textField',
       key: 'cameraName'
     },
     {
-      id: '3',
+      id: '2',
       placeholder: 'Stream Id*',
       type: 'textField',
       key: 'streamId'
@@ -44,18 +38,12 @@ function Camera() {
     },
     {
       id: '2',
-      placeholder: 'Company Id*',
-      type: 'textField',
-      key: 'companyId'
-    },
-    {
-      id: '3',
       placeholder: 'Camera Name *',
       type: 'textField',
       key: 'cameraName'
     },
     {
-      id: '4',
+      id: '3',
       placeholder: 'Stream Id*',
       type: 'textField',
       key: 'streamId'

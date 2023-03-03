@@ -11,15 +11,15 @@ constants.LEFT_MENU = [
   },
   {
     id: 2,
-    title: 'Device',
-    headerTitle: 'Device',
-    path: '/device'
-  },
-  {
-    id: 3,
     title: 'Company',
     headerTitle: 'Company',
     path: '/company'
+  },
+  {
+    id: 3,
+    title: 'Device',
+    headerTitle: 'Device',
+    path: '/device'
   },
   {
     id: 4,
@@ -36,8 +36,8 @@ constants.LEFT_MENU = [
 ]
 constants.HOME_TABS = [
   { id: 0, name: "User" },
-  {id:1, name: "Device"},
-  {id:2, name: "Company"},
+  {id:1, name: "Company"},
+  {id:2, name: "Device"},
   {id:3, name: "Camera"},
   {id:4, name: "Camera Visible For User"},
 ]

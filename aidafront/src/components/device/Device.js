@@ -9,6 +9,12 @@ function Device() {
       placeholder: 'Device Name*',
       type: 'textField',
       key: 'deviceName'
+    },
+    {
+      id: '1',
+      placeholder: 'Company Id*',
+      type: 'textField',
+      key: 'companyId'
     }
   ])
   const [updateDeviceFields, setUpdateDeviceFields] = useState([
@@ -24,6 +30,12 @@ function Device() {
       type: 'textField',
       key: 'deviceName'
     },
+    {
+      id: '2',
+      placeholder: 'Company Id*',
+      type: 'textField',
+      key: 'companyId'
+    }
   ])
   const onSave = async (postBody) => {
     let response = await put("/device", postBody)

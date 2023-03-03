@@ -30,20 +30,24 @@ export const handler = async (event, context, callback) => {
 
 const createDevice = async (postData, tableName) => {
   if (!(
-    postData.deviceName
+    postData.deviceName &&
+    postData.companyId
   )) {
     throw new Error("Required fields is missing");
   }
   const deviceId = uuidV4();
   const expressionAttributeValues = {
     ":deviceName": postData.deviceName,
-    ":deviceId": deviceId
+    ":deviceId": deviceId,
+    ":companyId": postData.companyId,
+    ":GSI1PK": constants.COMPANY_HASH + postData.companyId,
+    ":GSI1SK": constants.DEVICE_HASH + deviceId
   };
   const key = {
-    "PK": "DEV#",
-    "SK": "DEV#" + deviceId,
+    "PK": constants.DEVICE_HASH,
+    "SK": constants.DEVICE_HASH + deviceId
   };
-  const updateExpression = "Set deviceId =:deviceId, deviceName =:deviceName";
+  const updateExpression = "Set deviceId =:deviceId, deviceName =:deviceName, companyId =:companyId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const createDeviceParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, "", "UPDATED_NEW");
   return await call('update', createDeviceParams);
 };
@@ -51,19 +55,23 @@ const createDevice = async (postData, tableName) => {
 const updateDevice = async (postData, tableName) => {
   if (!(
     postData.deviceId &&
-    postData.deviceName
+    postData.deviceName &&
+    postData.companyId
   )) {
     throw new Error("Required fields is missing");
   }
   const expressionAttributeValues = {
     ":deviceId": postData.deviceId,
-    ":deviceName": postData.deviceName
+    ":deviceName": postData.deviceName,
+    ":companyId": postData.companyId,
+    ":GSI1PK": constants.COMPANY_HASH + postData.companyId,
+    ":GSI1SK": constants.DEVICE_HASH + postData.deviceId
   };
   const key = {
-    "PK": "DEV#",
-    "SK": "DEV#" + postData.deviceId,
+    "PK": constants.DEVICE_HASH,
+    "SK": constants.DEVICE_HASH + postData.deviceId,
   };
-  const updateExpression = "Set deviceId =:deviceId, deviceName =:deviceName";
+  const updateExpression = "Set deviceId =:deviceId, deviceName =:deviceName, companyId =:companyId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateDeviceParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
   return await call('update', updateDeviceParams);

@@ -95,8 +95,8 @@ const createUser = async (postData, tableName, userId) => {
     ":phone": postData.phone
   };
   const key = {
-    "PK": "USR#" + userId,
-    "SK": "USR#" + userId
+    "PK": constants.USER_HASH + userId,
+    "SK": constants.USER_HASH + userId
   };
   const updateExpression = "Set userId =:userId, firstName =:firstName, lastName =:lastName, email =:email, phone =:phone";
   const updateUserParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, "", "ALL_NEW");
@@ -144,8 +144,8 @@ const updateUser = async (postData, tableName) => {
     ":phone": postData.phone
   };
   const key = {
-    "PK": "USR#" + postData.userId,
-    "SK": "USR#" + postData.userId,
+    "PK": constants.USER_HASH + postData.userId,
+    "SK": constants.USER_HASH + postData.userId,
   };
   const updateExpression = "Set userId =:userId, firstName =:firstName, lastName =:lastName, email =:email, phone =:phone";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";

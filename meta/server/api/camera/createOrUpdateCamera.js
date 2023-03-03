@@ -31,25 +31,25 @@ export const handler = async (event, context, callback) => {
 const createCamera = async (postData, tableName) => {
   if (!(
     postData.deviceId &&
-    postData.companyId &&
     postData.cameraName &&
     postData.streamId
   )) {
     throw new Error("Required fields is missing");
   }
   const cameraId = uuidV4();
+  const deviceData = await fetchDeviceData(postData.deviceId, tableName);
   const expressionAttributeValues = {
     ":cameraId": cameraId,
     ":deviceId": postData.deviceId,
-    ":companyId": postData.companyId,
+    ":companyId": deviceData.companyId,
     ":cameraName": postData.cameraName,
     ":streamId": postData.streamId,
-    ":GSI1PK": "DEV#" + postData.deviceId,
-    ":GSI1SK": "CAM#" + cameraId
+    ":GSI1PK": constants.DEVICE_HASH + postData.deviceId,
+    ":GSI1SK": constants.CAMERA_HASH + cameraId
   };
   const key = {
-    "PK": "CAM#",
-    "SK": "CAM#" + cameraId,
+    "PK": constants.CAMERA_HASH,
+    "SK": constants.CAMERA_HASH + cameraId,
   };
   const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, companyId =:companyId, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const createCameraParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, "", "UPDATED_NEW");
@@ -60,27 +60,42 @@ const updateCamera = async (postData, tableName) => {
   if (!(
     postData.cameraId &&
     postData.deviceId &&
-    postData.companyId &&
     postData.cameraName &&
     postData.streamId
   )) {
     throw new Error("Required fields is missing");
   }
+  const deviceData = await fetchDeviceData(postData.deviceId, tableName);
   const expressionAttributeValues = {
     ":cameraId": postData.cameraId,
     ":deviceId": postData.deviceId,
-    ":companyId": postData.companyId,
+    ":companyId": deviceData.companyId,
     ":cameraName": postData.cameraName,
     ":streamId": postData.streamId,
-    ":GSI1PK": "DEV#" + postData.deviceId,
-    ":GSI1SK": "CAM#" + postData.cameraId
+    ":GSI1PK": constants.DEVICE_HASH + postData.deviceId,
+    ":GSI1SK": constants.CAMERA_HASH + postData.cameraId
   };
   const key = {
-    "PK": "CAM#",
-    "SK": "CAM#" + postData.cameraId,
+    "PK": constants.CAMERA_HASH,
+    "SK": constants.CAMERA_HASH + postData.cameraId,
   };
   const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, companyId =:companyId, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateCameraParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
   return await call('update', updateCameraParams);
+};
+
+const fetchDeviceData = async (deviceId, tableName) => {
+  let key = {
+    "PK": constants.DEVICE_HASH,
+    "SK": constants.DEVICE_HASH + deviceId
+  };
+  let getParams = prepareQueryObj("", "", tableName, "", key);
+  try {
+    let { 'Item': deviceData } = await call('get', getParams);
+    return deviceData;
+  } catch (e) {
+    console.log(e);
+    return failure(httpConstants.STATUS_404, constants.DEVICE_DATA_NOT_FOUND);
+  }
 };
