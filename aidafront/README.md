@@ -21,7 +21,7 @@ v16.15.0
 can you verify correct version of npm
 8.5.5
 
-### `npm i`
+### `npm i --legacy-peer-deps`
 
 Add these credentials into .env file as given below after serverless deploy:
 
