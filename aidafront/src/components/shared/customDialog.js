@@ -7,6 +7,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { makeStyles } from '@mui/styles'
 import { UserListDisplay } from './UserListDisplay'
+import Typography from '@mui/material/Typography'
 const Loading = React.lazy(() => import('./Loading'))
 const CustomTextField = React.lazy(() => import('./customTextField'))
 const CustomSecondaryButton = React.lazy(() => import('./customSecondaryButton'))
@@ -64,6 +65,10 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '10px',
     marginLeft: '15px',
     color: theme.palette.black.black333333
+  },
+  helperText:{
+    fontSize: "14px !important",
+    marginTop: "-14px !important"
   }
 }))
 
@@ -83,6 +88,9 @@ function CustomDialog(props) {
               if (item.key === "mainContactUserIds")
                 props.onChange('addMainContactUserIds', event)
             }} />
+            {
+              item.key === "mainContactUserIds" && <Typography className={classes.helperText}>Note: Press Enter to add main contact users</Typography>
+            }
             {
               item.key === "mainContactUserIds" && mainContactUserIdsList && mainContactUserIdsList.length > 0 && <UserListDisplay onChange={onChange} mainContactUserIdsList={mainContactUserIdsList} />
             }

@@ -12,7 +12,7 @@ function Company() {
     },
     {
       id: '1',
-      placeholder: 'Add one or more contact user id *',
+      placeholder: 'Add one or more main contact user id *',
       type: 'textField',
       key: 'mainContactUserIds'
     }

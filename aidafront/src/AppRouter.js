@@ -20,19 +20,17 @@ function AppRouter() {
     <Suspense fallback={<Loading />}>
       <Router>
         <Routes>
-          {
-            <Route path='/' element={<Layout />}>
-              <Route path="/" element={<Navigate replace to={`${isAuthenticated ? '/welcome' : '/sign-out'}`} />} />
-              <Route path='/welcome' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Welcome} />} />
-              <Route path='/user' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={User} />} />
-              <Route path='/company' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Company} />} />
-              <Route path='/camera' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Camera} />} />
-              <Route path='/device' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Device} />} />
-              <Route path='/camera-visibility' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={CameraVisibility} />} />
-              <Route exact path="/sign-out" element={<PublicAppRouter isAuthenticated={isAuthenticated} element={SignOut} />} />
-              <Route exact path="/sign-in" element={<PublicAppRouter isAuthenticated={isAuthenticated} element={SignIn} />} />
-            </Route>
-          }
+          <Route path='/' element={<Layout />}>
+            <Route path="/" element={<Navigate replace to={`${isAuthenticated ? '/welcome' : '/sign-out'}`} />} />
+            <Route path="/sign-out" element={<PublicAppRouter isAuthenticated={isAuthenticated} element={SignOut} />} />
+            <Route path="/sign-in" element={<PublicAppRouter isAuthenticated={isAuthenticated} element={SignIn} />} />
+            <Route path='/welcome' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Welcome} />} />
+            <Route path='/user' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={User} />} />
+            <Route path='/company' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Company} />} />
+            <Route path='/camera' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Camera} />} />
+            <Route path='/device' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Device} />} />
+            <Route path='/camera-visibility' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={CameraVisibility} />} />
+          </Route>
         </Routes>
       </Router>
     </Suspense>
