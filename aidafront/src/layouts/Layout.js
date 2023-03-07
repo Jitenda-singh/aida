@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
 const Layout = () => {
   const classes = useStyles()
   const { isAuthenticated, userData } = useSelector((state) => state.user)
-  const showSideBar = userData && userData["cognito:groups"] && userData["cognito:groups"].length>0 && (userData["cognito:groups"][0] && userData["cognito:groups"][0].includes("admin-group"))
+  const showSideBar = userData && userData["cognito:groups"] && userData["cognito:groups"].length > 0 && userData["cognito:groups"].some(item => item.includes("admin-group"))
   return (
     <>
       <Box className={`${classes.layoutBox} ${isAuthenticated ? '' : classes.authLayoutBox}`}>

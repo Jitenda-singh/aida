@@ -19,7 +19,7 @@ function Welcome(props) {
       <div>Hi <span style={{ textTransform: "capitalize" }}>{`${userInfo['given_name']} ${userInfo['family_name']}`}</span></div>
       {userInfo['cognito:username'] && <div style={{ margin: "20px 0 4px 0" }}>Name:&nbsp;<span style={{ textTransform: "capitalize" }}>{`${userInfo['given_name']} ${userInfo['family_name']}`}</span></div>}
       {userInfo['email'] && <div style={{ margin: "4px 0" }}>Email:&nbsp;<span>{userInfo['email']}</span></div>}
-      {userInfo['cognito:groups'] && <div style={{ margin: "4px 0" }}>Groups:&nbsp;<span>{userInfo['cognito:groups']}</span></div>}
+      {userInfo['cognito:groups'] && <div style={{ margin: "4px 0" }}>Groups:&nbsp;<span>{userInfo['cognito:groups'].join(', ')}</span></div>}
     </div>
       : <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", marginTop: "20px" }}>Loading...</div>
   )
