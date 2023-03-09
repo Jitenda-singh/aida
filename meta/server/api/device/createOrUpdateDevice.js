@@ -38,10 +38,12 @@ const createDevice = async (postData, tableName) => {
     throw new Error("Required fields is missing");
   }
   const deviceId = uuidV4();
+  const companyData = await fetchCompanyData(postData.companyId, tableName);
   const expressionAttributeValues = {
     ":deviceName": postData.deviceName,
     ":deviceId": deviceId,
     ":companyId": postData.companyId,
+    ":companyName": companyData.companyName || "",
     ":GSI1PK": constants.COMPANY_HASH + postData.companyId,
     ":GSI1SK": constants.DEVICE_HASH + deviceId
   };
@@ -49,7 +51,7 @@ const createDevice = async (postData, tableName) => {
     "PK": constants.DEVICE_HASH,
     "SK": constants.DEVICE_HASH + deviceId
   };
-  const updateExpression = "Set deviceId =:deviceId, deviceName =:deviceName, companyId =:companyId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
+  const updateExpression = "Set deviceId =:deviceId, deviceName =:deviceName, companyId =:companyId, companyName=:companyName, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const createDeviceParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, "", "UPDATED_NEW");
   return await call('update', createDeviceParams);
 };
@@ -62,10 +64,12 @@ const updateDevice = async (postData, tableName) => {
   )) {
     throw new Error("Required fields is missing");
   }
+  const companyData = await fetchCompanyData(postData.companyId, tableName);
   const expressionAttributeValues = {
     ":deviceId": postData.deviceId,
     ":deviceName": postData.deviceName,
     ":companyId": postData.companyId,
+    ":companyName": companyData.companyName || "",
     ":GSI1PK": constants.COMPANY_HASH + postData.companyId,
     ":GSI1SK": constants.DEVICE_HASH + postData.deviceId
   };
@@ -73,8 +77,23 @@ const updateDevice = async (postData, tableName) => {
     "PK": constants.DEVICE_HASH,
     "SK": constants.DEVICE_HASH + postData.deviceId,
   };
-  const updateExpression = "Set deviceId =:deviceId, deviceName =:deviceName, companyId =:companyId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
+  const updateExpression = "Set deviceId =:deviceId, deviceName =:deviceName, companyId =:companyId, companyName=:companyName, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateDeviceParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
   return await call('update', updateDeviceParams);
+};
+
+const fetchCompanyData = async (companyId, tableName) => {
+  let key = {
+    "PK": constants.COMPANY_HASH,
+    "SK": constants.COMPANY_HASH + companyId
+  };
+  let getParams = prepareQueryObj("", "", tableName, "", key);
+  try {
+    let { 'Item': companyData } = await call('get', getParams);
+    return companyData;
+  } catch (e) {
+    console.log(e);
+    return failure(httpConstants.STATUS_404, constants.COMPANY_DATA_NOT_FOUND);
+  }
 };
