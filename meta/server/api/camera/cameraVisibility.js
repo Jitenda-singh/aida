@@ -34,13 +34,19 @@ const createCameraVisibility = async (postData, tableName) => {
   )) {
     throw Error("Required fields is missing");
   }
+  const cameraData = await fetchCameraData(postData.cameraId, tableName);
   const expressionAttributeValues = {
     ":userId": postData.userId,
     ":cameraId": postData.cameraId,
+    ":cameraName": cameraData.cameraName || "",
+    ":deviceId": cameraData.deviceId,
+    ":deviceName": cameraData.deviceName || "",
+    ":companyId": cameraData.companyId,
+    ":companyName": cameraData.companyName || "",
     ":GSI1PK": constants.CAMERA_HASH + postData.cameraId,
     ":GSI1SK": constants.USER_HASH + postData.userId
   };
-  const updateExpression = "Set userId=:userId, cameraId =:cameraId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
+  const updateExpression = "Set userId=:userId, cameraId =:cameraId, cameraName=:cameraName, deviceId=:deviceId, deviceName=:deviceName, companyId=:companyId, companyName=:companyName, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const key = {
     "PK": constants.USER_HASH + postData.userId,
     "SK": constants.CAMERA_HASH + postData.cameraId,
@@ -70,3 +76,18 @@ const createCameraVisibility = async (postData, tableName) => {
 //   const updateCameraVisibilityParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
 //   await call('update', updateCameraVisibilityParams);
 // };
+
+const fetchCameraData = async (cameraId, tableName) => {
+  let key = {
+    "PK": constants.CAMERA_HASH,
+    "SK": constants.CAMERA_HASH + cameraId
+  };
+  let getParams = prepareQueryObj("", "", tableName, "", key);
+  try {
+    let { 'Item': cameraData } = await call('get', getParams);
+    return cameraData;
+  } catch (e) {
+    console.log(e);
+    return failure(httpConstants.STATUS_404, constants.CAMERA_DATA_NOT_FOUND);
+  }
+};

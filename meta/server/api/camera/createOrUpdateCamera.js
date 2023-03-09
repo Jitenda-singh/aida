@@ -43,7 +43,9 @@ const createCamera = async (postData, tableName) => {
   const expressionAttributeValues = {
     ":cameraId": cameraId,
     ":deviceId": postData.deviceId,
+    ":deviceName": deviceData.deviceName,
     ":companyId": deviceData.companyId,
+    ":companyName": deviceData.companyName,
     ":cameraName": postData.cameraName,
     ":streamId": postData.streamId,
     ":GSI1PK": constants.DEVICE_HASH + postData.deviceId,
@@ -53,7 +55,7 @@ const createCamera = async (postData, tableName) => {
     "PK": constants.CAMERA_HASH,
     "SK": constants.CAMERA_HASH + cameraId,
   };
-  const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, companyId =:companyId, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
+  const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, deviceName=:deviceName, companyId =:companyId, companyName=:companyName, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const createCameraParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, "", "UPDATED_NEW");
   return await call('update', createCameraParams);
 };
@@ -71,7 +73,9 @@ const updateCamera = async (postData, tableName) => {
   const expressionAttributeValues = {
     ":cameraId": postData.cameraId,
     ":deviceId": postData.deviceId,
+    ":deviceName": deviceData.deviceName || "",
     ":companyId": deviceData.companyId,
+    ":companyName": deviceData.companyName || "",
     ":cameraName": postData.cameraName,
     ":streamId": postData.streamId,
     ":GSI1PK": constants.DEVICE_HASH + postData.deviceId,
@@ -81,7 +85,7 @@ const updateCamera = async (postData, tableName) => {
     "PK": constants.CAMERA_HASH,
     "SK": constants.CAMERA_HASH + postData.cameraId,
   };
-  const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, companyId =:companyId, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
+  const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, deviceName=:deviceName, companyId =:companyId, companyName=:companyName, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateCameraParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
   return await call('update', updateCameraParams);
