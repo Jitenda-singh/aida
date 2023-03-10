@@ -4,6 +4,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
+import { fetchData, scanAndUpdate } from "../../helper/helper";
 export const handler = async (event, context, callback) => {
   try {
     const claims = getClaims(event);
@@ -69,8 +70,16 @@ const updateCompany = async (postData, tableName) => {
     "PK": "COM#",
     "SK": "COM#" + postData.companyId,
   };
+  const oldCompanyData = await fetchData(
+    { "PK": constants.COMPANY_HASH, "SK": constants.COMPANY_HASH + postData.companyId },
+    tableName
+  );
   const updateExpression = "Set companyId=:companyId, companyName =:companyName, mainContactUserIds =:mainContactUserIds";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateCompanyParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
-  return await call('update', updateCompanyParams);
+  const companyData = await call('update', updateCompanyParams);
+  if (oldCompanyData.companyName !== postData.companyName) {
+    await scanAndUpdate({ companyId: postData.companyId }, tableName, { companyName: postData.companyName });
+  }
+  return companyData;
 };

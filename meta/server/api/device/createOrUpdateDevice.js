@@ -4,6 +4,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
+import { fetchData, scanAndUpdate } from "../../helper/helper";
 export const handler = async (event, context, callback) => {
   try {
     const claims = getClaims(event);
@@ -38,7 +39,10 @@ const createDevice = async (postData, tableName) => {
     throw new Error("Required fields is missing");
   }
   const deviceId = uuidV4();
-  const companyData = await fetchCompanyData(postData.companyId, tableName);
+  const companyData = await fetchData(
+    { "PK": constants.COMPANY_HASH, "SK": constants.COMPANY_HASH + postData.companyId },
+    tableName
+  );
   const expressionAttributeValues = {
     ":deviceName": postData.deviceName,
     ":deviceId": deviceId,
@@ -64,7 +68,10 @@ const updateDevice = async (postData, tableName) => {
   )) {
     throw new Error("Required fields is missing");
   }
-  const companyData = await fetchCompanyData(postData.companyId, tableName);
+  const companyData = await fetchData(
+    { "PK": constants.COMPANY_HASH, "SK": constants.COMPANY_HASH + postData.companyId },
+    tableName
+  );
   const expressionAttributeValues = {
     ":deviceId": postData.deviceId,
     ":deviceName": postData.deviceName,
@@ -77,23 +84,16 @@ const updateDevice = async (postData, tableName) => {
     "PK": constants.DEVICE_HASH,
     "SK": constants.DEVICE_HASH + postData.deviceId,
   };
+  const oldDeviceData = await fetchData(
+    { "PK": constants.DEVICE_HASH, "SK": constants.DEVICE_HASH + postData.deviceId },
+    tableName
+  );
   const updateExpression = "Set deviceId =:deviceId, deviceName =:deviceName, companyId =:companyId, companyName=:companyName, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateDeviceParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
-  return await call('update', updateDeviceParams);
-};
-
-const fetchCompanyData = async (companyId, tableName) => {
-  let key = {
-    "PK": constants.COMPANY_HASH,
-    "SK": constants.COMPANY_HASH + companyId
-  };
-  let getParams = prepareQueryObj("", "", tableName, "", key);
-  try {
-    let { 'Item': companyData } = await call('get', getParams);
-    return companyData;
-  } catch (e) {
-    console.log(e);
-    return failure(httpConstants.STATUS_404, constants.COMPANY_DATA_NOT_FOUND);
+  const deviceData = await call('update', updateDeviceParams);
+  if (oldDeviceData.deviceName !== postData.deviceName) {
+    await scanAndUpdate({ deviceId: postData.deviceId }, tableName, { deviceName: postData.deviceName });
   }
+  return deviceData;
 };

@@ -2,6 +2,7 @@ export const constants = {
   TABLE_NAME_DATA_TABLE: "DataTable",
   ACTION_KEY: 'Action',
   DEFAULT_MESSAGE_UNAUTHORIZED_USER: "Unauthorized User",
+  DATA_NOT_FOUND: "Data not found",
   DEVICE_DATA_NOT_FOUND: "Device data not found",
   COMPANY_DATA_NOT_FOUND: "Company data not found",
   CAMERA_DATA_NOT_FOUND: "Camera data not found",
