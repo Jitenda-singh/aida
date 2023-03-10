@@ -4,6 +4,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
+import { fetchData, scanAndUpdate } from "../../helper/helper";
 export const handler = async (event, context, callback) => {
   try {
     const claims = getClaims(event);
@@ -39,7 +40,10 @@ const createCamera = async (postData, tableName) => {
     throw new Error("Required fields is missing");
   }
   const cameraId = uuidV4();
-  const deviceData = await fetchDeviceData(postData.deviceId, tableName);
+  const deviceData = await fetchData(
+    { "PK": constants.DEVICE_HASH, "SK": constants.DEVICE_HASH + postData.deviceId },
+    tableName
+  );
   const expressionAttributeValues = {
     ":cameraId": cameraId,
     ":deviceId": postData.deviceId,
@@ -69,7 +73,10 @@ const updateCamera = async (postData, tableName) => {
   )) {
     throw new Error("Required fields is missing");
   }
-  const deviceData = await fetchDeviceData(postData.deviceId, tableName);
+  const deviceData = await fetchData(
+    { "PK": constants.DEVICE_HASH, "SK": constants.DEVICE_HASH + postData.deviceId },
+    tableName
+  );
   const expressionAttributeValues = {
     ":cameraId": postData.cameraId,
     ":deviceId": postData.deviceId,
@@ -85,23 +92,16 @@ const updateCamera = async (postData, tableName) => {
     "PK": constants.CAMERA_HASH,
     "SK": constants.CAMERA_HASH + postData.cameraId,
   };
+  const oldCameraData = await fetchData(
+    { "PK": constants.CAMERA_HASH, "SK": constants.CAMERA_HASH + postData.cameraId },
+    tableName
+  );
   const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, deviceName=:deviceName, companyId =:companyId, companyName=:companyName, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateCameraParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
-  return await call('update', updateCameraParams);
-};
-
-const fetchDeviceData = async (deviceId, tableName) => {
-  let key = {
-    "PK": constants.DEVICE_HASH,
-    "SK": constants.DEVICE_HASH + deviceId
-  };
-  let getParams = prepareQueryObj("", "", tableName, "", key);
-  try {
-    let { 'Item': deviceData } = await call('get', getParams);
-    return deviceData;
-  } catch (e) {
-    console.log(e);
-    return failure(httpConstants.STATUS_404, constants.DEVICE_DATA_NOT_FOUND);
+  const cameraData = await call('update', updateCameraParams);
+  if (oldCameraData.cameraName !== postData.cameraName) {
+    await scanAndUpdate({ cameraId: postData.cameraId }, tableName, { cameraName: postData.cameraName });
   }
+  return cameraData;
 };

@@ -43,6 +43,9 @@ provider:
     - Effect: Allow
       Action: "dynamodb:GetItem"
       Resource: !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${DataTable}
+    - Effect: Allow
+      Action: "dynamodb:Scan"
+      Resource: !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${DataTable}
 
 custom:
   outputToEnv:
