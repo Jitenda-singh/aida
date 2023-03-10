@@ -61,7 +61,6 @@ export const getAllTableItems = async (obj, tableName) => {
       }
       itemList = itemList.concat(Items);
     } while (typeof lastEvaluatedKey != "undefined");
-    console.log("AllItems==>", JSON.stringify(itemList));
     return itemList;
   } catch (e) {
     console.log("Err:", e);
