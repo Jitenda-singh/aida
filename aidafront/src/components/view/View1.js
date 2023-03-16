@@ -138,6 +138,7 @@ function View1() {
   }
   const handleClick = async (index, next) => {
     try {
+      if(index !== currIndex) setResults()
       setError()
       setWaitingForAPI(true)
       let item, itemId;
