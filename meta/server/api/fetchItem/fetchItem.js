@@ -76,6 +76,13 @@ const fetchUserData = async (claims, isAdminUser, isNormalUser, id, tableName, q
       exclusiveStartKey,
       constants.LIMIT_20
     );
+    let processedData = [];
+    if (queryStringParam && queryStringParam.cameraId) {
+      userData && userData.Items && userData.Items.length && userData.Items.forEach(object => {
+        processedData.push({ GSI1PK: object['GSI1PK'], GSI1SK: object['GSI1SK'], PK: object['PK'] });
+      });
+    }
+    userData.Items = [...processedData];
   } else {
     if (isNormalUser && claims['cognito:username'] !== id)
       return failure(httpConstants.STATUS_401, constants.DEFAULT_MESSAGE_UNAUTHORIZED_USER);
@@ -99,6 +106,10 @@ const fetchCompanyData = async (claims, isAdminUser, isNormalUser, id, tableName
       { "PK": constants.COMPANY_HASH, "SK": constants.COMPANY_HASH + id },
       tableName
     );
+  }
+  if (companyData) {
+    delete companyData['GSI1PK'];
+    delete companyData['GSI1SK'];
   }
   return companyData;
 };
@@ -128,11 +139,27 @@ const fetchCameraData = async (claims, isAdminUser, isNormalUser, id, tableName,
       exclusiveStartKey,
       constants.LIMIT_20
     );
+    let processedData = [];
+    if (queryStringParam && queryStringParam.deviceId) {
+      cameraData && cameraData.Items && cameraData.Items.length && cameraData.Items.forEach(object => {
+        processedData.push({ GSI1PK: object['GSI1PK'], GSI1SK: object['GSI1SK'], PK: object['SK'] });
+      });
+      cameraData.Items = [...processedData];
+    } else {
+      cameraData && cameraData.Items && cameraData.Items.length && cameraData.Items.forEach(object => {
+        delete object['GSI1PK'];
+        delete object['GSI1SK'];
+      });
+    }
   } else {
     cameraData = await fetchData(
       { "PK": constants.CAMERA_HASH, "SK": constants.CAMERA_HASH + id },
       tableName
     );
+    if (cameraData) {
+      delete cameraData['GSI1PK'];
+      delete cameraData['GSI1SK'];
+    }
   }
   return cameraData;
 };
@@ -159,6 +186,10 @@ const fetchDeviceData = async (claims, isAdminUser, isNormalUser, id, tableName,
       exclusiveStartKey,
       constants.LIMIT_20
     );
+    deviceData && deviceData.Items && deviceData.Items.length && deviceData.Items.forEach(object => {
+      delete object['GSI1PK'];
+      delete object['GSI1SK'];
+    });
   }
   return deviceData;
 };
@@ -189,5 +220,9 @@ const fetchCameraVisibilityData = async (claims, isAdminUser, isNormalUser, id, 
       (queryStringParam && queryStringParam.limit) || constants.LIMIT_20
     );
   }
+  cameraVisibilityData && cameraVisibilityData.Items && cameraVisibilityData.Items.length && cameraVisibilityData.Items.forEach(object => {
+    delete object['GSI1PK'];
+    delete object['GSI1SK'];
+  });
   return cameraVisibilityData;
 };
