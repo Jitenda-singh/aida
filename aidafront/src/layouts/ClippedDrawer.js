@@ -34,7 +34,7 @@ const useStyles = makeStyles({
   },
   drawerListItem: {
     backgroundColor: 'white',
-    height: '55px',
+    // height: '55px',
     fontSize: '20px',
     borderBottom: '1px solid #cccccc',
     color: '#0d52a1'

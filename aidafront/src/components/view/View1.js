@@ -6,13 +6,14 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/system/Box';
 import { get } from '../../utils/httpHelper';
 import { useSelector } from 'react-redux';
+import Loading from '../shared/Loading';
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
     justifyContent: "flex-start",
-    width: '700px'
+    width: '100vw-300px'
   },
   itemStyle: {
     // width: 400
@@ -43,8 +44,21 @@ const useStyles = makeStyles((theme) => ({
     "& .MuiButton-sizeSmall": {
       textTransform: "none !important",
       fontSize: "14px",
+      fontFamily: "Figtree, sans-serif !important",
       color: theme.palette.primary.text
     }
+  },
+  inputStyle: {
+    height: "24px",
+    width: "30ch",
+    fontSize: "14px",
+    fontWeight: "400 !important",
+    fontFamily: "Figtree, sans-serif !important",
+  },
+  tdStyle: {
+    padding: "10px",
+    whiteSpace: "nowrap",
+    textAlign: "left"
   }
 }))
 function View1() {
@@ -109,6 +123,7 @@ function View1() {
   const [loadMore, setLoadMore] = useState(false)
   const [currIndex, setCurrIndex] = useState()
   const [error, setError] = useState()
+  const [waitingForAPI, setWaitingForAPI] = useState(false)
   const classes = useStyles()
   const onChange = (index, value) => {
     const obj = {
@@ -123,7 +138,8 @@ function View1() {
   }
   const handleClick = async (index, next) => {
     try {
-      setError();
+      setError()
+      setWaitingForAPI(true)
       let item, itemId;
       let queryStringParameters = {}
       if (list[index].textFieldReq && list[index].value && list[index].value.trim() !== "") {
@@ -159,21 +175,23 @@ function View1() {
         }
           : response
       )
+      setWaitingForAPI(false)
     } catch (err) {
       setResults()
       setCurrIndex(index)
       setError(err.message)
+      setWaitingForAPI(false)
     }
   }
   return (
     <div className={classes.root}>{
       list.map((item, index) =>
         <div key={item.id} className={classes.itemStyle}>
-          <div>
+          <div className='list-item'>
             <span>{index + 1}.&nbsp;</span>
-            <Button size="small" className={classes.buttonStyle} onClick={() => handleClick(index)}>{item.text}</Button>
+            <Button size="small" className={`${classes.buttonStyle} list-item`} onClick={() => handleClick(index)}>{item.text}</Button>
           </div>
-          {item.textFieldReq && <input type="text" id={item.id} onChange={event => onChange(index, event.target.value)} style={{ height: "20px" }} />}
+          {item.textFieldReq && <input type="text" id={item.id} onChange={event => onChange(index, event.target.value)} className={classes.inputStyle} />}
         </div>
       )
     }
@@ -191,7 +209,7 @@ function View1() {
                   <tr>
                     {
                       row && Object.keys(row) && Object.keys(row).length && Object.keys(row).length > 0 ? Object.keys(row).sort().map(item =>
-                        <td key={item} width="100%" style={{ padding: "10px", whiteSpace: "nowrap" }} className='view1-results'>
+                        <td key={item} width="100%" className={`${classes.tdStyle} view1-results`}>
                           {item}:&nbsp;{row[item]}
                         </td>)
                         : <></>
@@ -213,11 +231,12 @@ function View1() {
               error && <Typography style={{ padding: "10px" }} className='view1-results'>{error}</Typography>
             }
           </table>
-          {
-            loadMore && <div className={classes.buttonStyle}>
-              <Button size="small" onClick={() => handleClick(currIndex, true)}>Load more</Button>
-            </div>
-          }
+          <div className={classes.buttonStyle}>
+            {
+              loadMore ? <Button size="small" onClick={() => handleClick(currIndex, true)}>Load more</Button>
+                : waitingForAPI ? <Loading /> : <></>
+            }
+          </div>
         </Paper>
       </Box>
     </div>
