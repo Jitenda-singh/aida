@@ -38,15 +38,17 @@ provider:
       Action: "cognito-idp:*"
       Resource: !Sub arn:aws:cognito-idp:${self:provider.region}:${AWS::AccountId}:userpool/${userPool}
     - Effect: Allow
-      Action: "dynamodb:UpdateItem"
+      Action:
+        - dynamodb:UpdateItem
+        - dynamodb:GetItem
+        - dynamodb:Query
+        - dynamodb:Scan
       Resource: !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${DataTable}
     - Effect: Allow
-      Action: "dynamodb:GetItem"
-      Resource: !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${DataTable}
-    - Effect: Allow
-      Action: "dynamodb:Scan"
-      Resource: !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${DataTable}
-
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+      Resource: !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${DataTable}/index/*
 custom:
   outputToEnv:
     fileName: ../${self:provider.frontendDirectoryName}/.env

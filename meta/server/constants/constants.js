@@ -11,5 +11,11 @@ export const constants = {
   USER_HASH: 'USR#',
   COMPANY_HASH: 'COM#',
   DEVICE_HASH: 'DEV#',
-  CAMERA_HASH: 'CAM#'
+  CAMERA_HASH: 'CAM#',
+  USER_KEYWORD: "user",
+  COMPANY_KEYWORD: "company",
+  CAMERA_KEYWORD: "camera",
+  DEVICE_KEYWORD: "device",
+  CAMERA_VISIBILITY_KEYWORD: "camera-visibility",
+  LIMIT_20: 20,
 };

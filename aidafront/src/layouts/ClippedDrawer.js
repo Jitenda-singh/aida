@@ -7,9 +7,11 @@ import ListItem from '@mui/material/ListItem'
 import ListItemButton from '@mui/material/ListItemButton'
 import ListItemText from '@mui/material/ListItemText'
 import { makeStyles } from '@mui/styles'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import constants from '../constants/constants'
-
+import { useSelector } from 'react-redux'
+import Loading from '../components/shared/Loading'
+const CameraDrawer = React.lazy(() => import('./CameraDrawer'))
 const drawerWidth = 185
 const useStyles = makeStyles({
   drawer: {
@@ -32,7 +34,7 @@ const useStyles = makeStyles({
   },
   drawerListItem: {
     backgroundColor: 'white',
-    height: '55px',
+    // height: '55px',
     fontSize: '20px',
     borderBottom: '1px solid #cccccc',
     color: '#0d52a1'
@@ -56,8 +58,18 @@ const useStyles = makeStyles({
   }
 })
 
-export default function ClippedDrawer () {
+export default function ClippedDrawer() {
   const classes = useStyles()
+  const { userData } = useSelector((state) => state.user)
+  const userGroupInfo = userData && userData["cognito:groups"] && userData["cognito:groups"].length > 0 && userData["cognito:groups"]
+  const isAdminUser = userGroupInfo && userGroupInfo.some(item => item.includes("admin-group"))
+  const isNormalUser = !isAdminUser && userGroupInfo && userGroupInfo.some(item => item.includes("user-group"))
+
+  const [isView2, setIsView2] = React.useState(false)
+  let location = useLocation();
+  React.useEffect(() => {
+    setIsView2(location.pathname === "/view2")
+  }, [location])
   return (
     <Drawer
       variant="permanent"
@@ -65,23 +77,30 @@ export default function ClippedDrawer () {
     >
       <Toolbar />
       <Box className={classes.overflowAuto}>
-        <List>
-          {(constants.LEFT_MENU).map((item, index) => (
-            <ListItem key={index} className={classes.drawerListItem} >
-              <NavLink isActive={(match) => {
-                if (!match) {
-                  return false
-                }
-                const eventID = parseInt(match.params.eventID)
-                return !isNaN(eventID) && eventID % 2 === 1
-              }} to={item.path} className={classes.navLink}>
-                <ListItemButton className={classes.listItemButton}>
-                  <ListItemText primary={<span className='font-family-20'>{item.title}</span>} />
-                </ListItemButton>
-              </NavLink>
-            </ListItem>
-          ))}
-        </List>
+        <React.Suspense fallback={<Loading />}>
+          <List>
+            {isView2 ? isNormalUser ? <CameraDrawer userData={userData} /> : <></>
+              : (constants.LEFT_MENU).map((item, index) => (
+                (item.id < 6 ? isAdminUser
+                  : item.id === 6 ? (isAdminUser || isNormalUser)
+                    : item.id > 6 ? isNormalUser
+                      : false) &&
+                <ListItem key={index} className={classes.drawerListItem} >
+                  <NavLink isActive={(match) => {
+                    if (!match) {
+                      return false
+                    }
+                    const eventID = parseInt(match.params.eventID)
+                    return !isNaN(eventID) && eventID % 2 === 1
+                  }} to={item.path} className={classes.navLink}>
+                    <ListItemButton className={classes.listItemButton}>
+                      <ListItemText primary={<span className='font-family-20'>{item.title}</span>} />
+                    </ListItemButton>
+                  </NavLink>
+                </ListItem>
+              ))}
+          </List>
+        </React.Suspense>
       </Box>
     </Drawer>
   )
