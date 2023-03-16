@@ -138,7 +138,7 @@ function View1() {
   }
   const handleClick = async (index, next) => {
     try {
-      if(index !== currIndex) setResults()
+      if (index !== currIndex) setResults()
       setError()
       setWaitingForAPI(true)
       let item, itemId;
@@ -211,7 +211,7 @@ function View1() {
                     {
                       row && Object.keys(row) && Object.keys(row).length && Object.keys(row).length > 0 ? Object.keys(row).sort().map(item =>
                         <td key={item} width="100%" className={`${classes.tdStyle} view1-results`}>
-                          {item}:&nbsp;{row[item]}
+                          {item}:&nbsp;{typeof row[item] === "object" ? row[item].join(", ") : row[item]}
                         </td>)
                         : <></>
                     }
@@ -222,7 +222,7 @@ function View1() {
                   {
                     results && Object.keys(results) && Object.keys(results).length && Object.keys(results).length > 0 ? Object.keys(results).sort().map(item =>
                       <td key={item} width="100%" style={{ padding: "10px", whiteSpace: "nowrap" }} className='view1-results'>
-                        {item}:&nbsp;{results[item]}
+                        {item}:&nbsp;{typeof results[item] === "object" ? results[item].join(", ") : results[item]}
                       </td>)
                       : <></>
                   }
