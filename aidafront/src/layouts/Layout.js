@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Outlet } from 'react-router-dom'
 import Box from '@mui/material/Box'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -50,8 +50,8 @@ const useStyles = makeStyles((theme) => ({
 
 const Layout = () => {
   const classes = useStyles()
-  const { isAuthenticated, userData } = useSelector((state) => state.user)
-  const showSideBar = userData && userData["cognito:groups"] && userData["cognito:groups"].length > 0 && userData["cognito:groups"].some(item => item.includes("admin-group"))
+  const { isAuthenticated } = useSelector((state) => state.user)
+  // const showSideBar = userData && userData["cognito:groups"] && userData["cognito:groups"].length > 0 && userData["cognito:groups"].some(item => item.includes("admin-group"))
   return (
     <>
       <Box className={`${classes.layoutBox} ${isAuthenticated ? '' : classes.authLayoutBox}`}>
@@ -59,7 +59,7 @@ const Layout = () => {
           <CssBaseline />
           {isAuthenticated && <CustomAppBar />}
           {/* {isAuthenticated && <AuthHeader />} */}
-          {isAuthenticated && showSideBar && <ClippedDrawer />}
+          {isAuthenticated && <ClippedDrawer />}
           <Box component="main" className={`${isAuthenticated ? classes.main : classes.authMain}`}>
             <Container className={`${isAuthenticated ? classes.mainContainer : classes.authContainer}`}>
               <Outlet />

@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:400,500,600,700,800&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Fira+Sans:400,500,600,700,800');
 * {
   box-sizing: border-box;
@@ -59,4 +60,24 @@ body, html, .App, #root, .auth-wrapper {
 }
 .forgot-password a {
   color: #167bff;
+}
+button{
+  font-family: 'Figtree', sans-serif;
+}
+
+.view1-results {
+  font-family: 'Figtree', sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+}
+
+.deviceMenu {
+  font-family: 'Figtree', sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+}
+.cameraMenu{
+  font-family: 'Figtree', sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
 }

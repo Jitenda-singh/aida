@@ -13,9 +13,15 @@ const Company = React.lazy(() => import('./components/company/Company'))
 const Device = React.lazy(() => import('./components/device/Device'))
 const Camera = React.lazy(() => import('./components/camera/Camera'))
 const CameraVisibility = React.lazy(() => import('./components/camera/CameraVisibility'))
+const View1 = React.lazy(() => import('./components/view/View1'))
+const View2 = React.lazy(() => import('./components/view/View2'))
 
 function AppRouter() {
-  const { isAuthenticated } = useSelector((state) => state.user)
+  const { isAuthenticated, userData } = useSelector((state) => state.user)
+  const userGroupInfo = userData && userData["cognito:groups"] && userData["cognito:groups"].length > 0 && userData["cognito:groups"]
+  const isAdminUser = userGroupInfo && userGroupInfo.some(item => item.includes("admin-group"))
+  const isNormalUser = !isAdminUser && userGroupInfo && userGroupInfo.some(item => item.includes("user-group"))
+
   return (
     <Suspense fallback={<Loading />}>
       <Router>
@@ -25,11 +31,13 @@ function AppRouter() {
             <Route path="/sign-out" element={<PublicAppRouter isAuthenticated={isAuthenticated} element={SignOut} />} />
             <Route path="/sign-in" element={<PublicAppRouter isAuthenticated={isAuthenticated} element={SignIn} />} />
             <Route path='/welcome' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Welcome} />} />
-            <Route path='/user' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={User} />} />
-            <Route path='/company' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Company} />} />
-            <Route path='/camera' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Camera} />} />
-            <Route path='/device' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={Device} />} />
-            <Route path='/camera-visibility' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={CameraVisibility} />} />
+            <Route path='/user' element={<PrivateAppRouter isAuthenticated={isAuthenticated && isAdminUser} element={User} />} />
+            <Route path='/company' element={<PrivateAppRouter isAuthenticated={isAuthenticated && isAdminUser} element={Company} />} />
+            <Route path='/camera' element={<PrivateAppRouter isAuthenticated={isAuthenticated && isAdminUser} element={Camera} />} />
+            <Route path='/device' element={<PrivateAppRouter isAuthenticated={isAuthenticated && isAdminUser} element={Device} />} />
+            <Route path='/camera-visibility' element={<PrivateAppRouter isAuthenticated={isAuthenticated && isAdminUser} element={CameraVisibility} />} />
+            <Route path='/view1' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={View1} />} />
+            <Route path='/view2' element={<PrivateAppRouter isAuthenticated={isAuthenticated && isNormalUser} element={View2} />} />
           </Route>
         </Routes>
       </Router>

@@ -85,6 +85,21 @@ cameraVisibility:
           authorizerId:
             Ref: ApiGatewayAuthorizer
 
+# api to get data
+fetchItem:
+  handler: server/api/fetchItem/fetchItem.handler
+  events:
+    - http:
+        path: /get/{item}/{itemId}
+        method: get
+        cors:
+          origin: "*"
+          maxAge: 86400
+        authorizer:
+          type: "COGNITO_USER_POOLS"
+          authorizerId:
+            Ref: ApiGatewayAuthorizer
+
 postConfirmation:
   handler: server/cognito_triggers/postConfirmation.trigger
   events:

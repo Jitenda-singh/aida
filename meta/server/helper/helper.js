@@ -14,6 +14,16 @@ export const fetchData = async (key, tableName) => {
   }
 };
 
+export const queryData = async (tableName, indexName, expAttrValues, keyCondExp, exclusiveStartKey, limit) => {
+  let getParams = prepareQueryObj("", "", tableName, indexName, "", "", expAttrValues, "", "", "", keyCondExp, "", exclusiveStartKey, "", limit);
+  try {
+    let data = await call('query', getParams);
+    return data;
+  } catch (e) {
+    console.log(e);
+    return failure(httpConstants.STATUS_404, constants.DATA_NOT_FOUND);
+  }
+};
 export const scanAndUpdate = async (obj, tableName, updateObj) => {
   try {
     const itemList = await getAllTableItems(obj, tableName);

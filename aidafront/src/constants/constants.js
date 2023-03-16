@@ -32,14 +32,17 @@ constants.LEFT_MENU = [
     title: 'Camera Visible For User',
     headerTitle: 'Camera Visible For User',
     path: '/camera-visibility'
+  },
+  {
+    id: 6,
+    title: "View1",
+    path: "/view1"
+  },
+  {
+    id: 7,
+    title: "View2",
+    path: "/view2"
   }
-]
-constants.HOME_TABS = [
-  { id: 0, name: "User" },
-  {id:1, name: "Company"},
-  {id:2, name: "Device"},
-  {id:3, name: "Camera"},
-  {id:4, name: "Camera Visible For User"},
 ]
 constants.ACTIONS={
   create: "create",
@@ -52,4 +55,5 @@ constants.SUCCESS_MESSAGE= {
 constants.ERROR_MESSAGE= {
   TYPE: 'error'
 }
+constants.LIMIT_200 = 200
 export default constants
