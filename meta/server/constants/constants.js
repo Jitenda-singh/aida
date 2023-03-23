@@ -18,4 +18,5 @@ export const constants = {
   DEVICE_KEYWORD: "device",
   CAMERA_VISIBILITY_KEYWORD: "camera-visibility",
   LIMIT_20: 20,
+  GLOBAL_INDEX_GSI1: "GSI1"
 };

@@ -4,7 +4,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
-import { fetchData, scanAndUpdate } from "../../helper/helper";
+import { fetchAll, fetchData, updateItem } from "../../helper/helper";
 export const handler = async (event, context, callback) => {
   try {
     const claims = getClaims(event);
@@ -88,12 +88,55 @@ const updateDevice = async (postData, tableName) => {
     { "PK": constants.DEVICE_HASH, "SK": constants.DEVICE_HASH + postData.deviceId },
     tableName
   );
+  if (oldDeviceData.deviceName !== postData.deviceName) {
+    await updateDeviceNameInCamera(postData.deviceId, tableName, postData.deviceName);
+  }
   const updateExpression = "Set deviceId =:deviceId, deviceName =:deviceName, companyId =:companyId, companyName=:companyName, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateDeviceParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
   const deviceData = await call('update', updateDeviceParams);
-  if (oldDeviceData.deviceName !== postData.deviceName) {
-    await scanAndUpdate({ deviceId: postData.deviceId }, tableName, { deviceName: postData.deviceName });
-  }
   return deviceData;
+};
+
+const updateDeviceNameInCamera = async (deviceId, tableName, deviceName) => {
+  const indexName = constants.GLOBAL_INDEX_GSI1;
+  const expAttrValues = {
+    ':GSI1PK': constants.DEVICE_HASH + deviceId
+  };
+  const keyCondExp = 'GSI1PK=:GSI1PK';
+  let getObj = prepareQueryObj("", "", tableName, indexName, "", "", expAttrValues, "", "", "", keyCondExp);
+  let cameraList = await fetchAll(getObj);
+  Promise.all(cameraList && cameraList.length && cameraList.map(async item => {
+      await updateDeviceNameInCameraVisibility(item.cameraId, tableName, deviceName);
+    const expAttributeValues = {
+      ":deviceName": deviceName
+    };
+    const key = {
+      "PK": item.PK,
+      "SK": item.SK
+    };
+    const updateExpression = "Set deviceName =:deviceName";
+    await updateItem(tableName, key, expAttributeValues, updateExpression);
+  }));
+};
+
+const updateDeviceNameInCameraVisibility = async (cameraId, tableName, deviceName) => {
+  const indexName = constants.GLOBAL_INDEX_GSI1;
+  const expAttrValues = {
+    ':GSI1PK': constants.CAMERA_HASH + cameraId
+  };
+  const keyCondExp = 'GSI1PK=:GSI1PK';
+  let getObj = prepareQueryObj("", "", tableName, indexName, "", "", expAttrValues, "", "", "", keyCondExp);
+  let cameraVisList = await fetchAll(getObj);
+  Promise.all(cameraVisList && cameraVisList.length && cameraVisList.map(async item => {
+    const expAttributeValues = {
+      ":deviceName": deviceName
+    };
+    const key = {
+      "PK": item.PK,
+      "SK": item.SK
+    };
+    const updateExpression = "Set deviceName =:deviceName";
+    await updateItem(tableName, key, expAttributeValues, updateExpression);
+  }));
 };

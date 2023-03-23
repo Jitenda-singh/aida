@@ -76,3 +76,22 @@ export const getAllTableItems = async (obj, tableName) => {
     console.log("Err:", e);
   }
 };
+
+export const updateItem = async (tableName, key, expAttributeValues, updateExpr) => {
+  const updateParams = prepareQueryObj("", "", tableName, "", key, "", expAttributeValues, updateExpr, "", "ALL_NEW");
+  await call('update', updateParams);
+};
+
+export const fetchAll = async (getObj) => {
+  let lastEvaluatedKey;
+  let list = [];
+  do {
+    const { Items, LastEvaluatedKey } = await call('query', getObj);
+    lastEvaluatedKey = LastEvaluatedKey;
+    if (LastEvaluatedKey) {
+      getObj['ExclusiveStartKey'] = LastEvaluatedKey;
+    }
+    list = list.concat(Items);
+  } while (typeof lastEvaluatedKey != "undefined");
+  return list;
+};
