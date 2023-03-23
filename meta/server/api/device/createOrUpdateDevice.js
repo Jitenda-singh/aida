@@ -4,7 +4,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
-import { fetchData, scanAndUpdate } from "../../helper/helper";
+import { fetchData, queryData, updateItem } from "../../helper/helper";
 export const handler = async (event, context, callback) => {
   try {
     const claims = getClaims(event);
@@ -88,12 +88,66 @@ const updateDevice = async (postData, tableName) => {
     { "PK": constants.DEVICE_HASH, "SK": constants.DEVICE_HASH + postData.deviceId },
     tableName
   );
+  if (oldDeviceData.deviceName !== postData.deviceName) {
+    await queryAndUpdate(postData.deviceId, tableName, postData.deviceName);
+  }
   const updateExpression = "Set deviceId =:deviceId, deviceName =:deviceName, companyId =:companyId, companyName=:companyName, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateDeviceParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
   const deviceData = await call('update', updateDeviceParams);
-  if (oldDeviceData.deviceName !== postData.deviceName) {
-    await scanAndUpdate({ deviceId: postData.deviceId }, tableName, { deviceName: postData.deviceName });
-  }
   return deviceData;
+};
+
+const queryAndUpdate = async (deviceId, tableName, deviceName) => {
+  const indexName = constants.GLOBAL_INDEX_GSI1;
+  let lastEvaluatedKey;
+  let camVisAlreadyUpdated = {};
+  do {
+    const expAttrValues = {
+      ':GSI1PK': constants.DEVICE_HASH + deviceId
+    };
+    const keyCondExp = 'GSI1PK=:GSI1PK';
+    const { Items, LastEvaluatedKey } = await queryData(tableName, indexName, expAttrValues, keyCondExp, lastEvaluatedKey);
+    lastEvaluatedKey = LastEvaluatedKey;
+    // itemList = itemList.concat(Items);
+    Promise.all(Items && Items.length && Items.map(async item => {
+      if (!camVisAlreadyUpdated[item.cameraId]) {
+        camVisAlreadyUpdated[item.cameraId] = true;
+        await queryAndUpdateCamVisibility(item.cameraId, tableName, deviceName);
+      }
+      const expAttributeValues = {
+        ":deviceName": deviceName
+      };
+      const key = {
+        "PK": item.PK,
+        "SK": item.SK
+      };
+      const updateExpression = "Set deviceName =:deviceName";
+      await updateItem(tableName, key, expAttributeValues, updateExpression);
+    }));
+  } while (typeof lastEvaluatedKey != "undefined");
+};
+
+const queryAndUpdateCamVisibility = async (cameraId, tableName, deviceName) => {
+  const indexName = constants.GLOBAL_INDEX_GSI1;
+  let lastEvaluatedKey;
+  do {
+    const expAttrValues = {
+      ':GSI1PK': constants.CAMERA_HASH + cameraId
+    };
+    const keyCondExp = 'GSI1PK=:GSI1PK';
+    const { Items, LastEvaluatedKey } = await queryData(tableName, indexName, expAttrValues, keyCondExp, lastEvaluatedKey);
+    lastEvaluatedKey = LastEvaluatedKey;
+    Promise.all(Items && Items.length && Items.map(async item => {
+      const expAttributeValues = {
+        ":deviceName": deviceName
+      };
+      const key = {
+        "PK": item.PK,
+        "SK": item.SK
+      };
+      const updateExpression = "Set deviceName =:deviceName";
+      await updateItem(tableName, key, expAttributeValues, updateExpression);
+    }));
+  } while (typeof lastEvaluatedKey != "undefined");
 };

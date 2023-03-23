@@ -76,3 +76,8 @@ export const getAllTableItems = async (obj, tableName) => {
     console.log("Err:", e);
   }
 };
+
+export const updateItem = async (tableName, key, expAttributeValues, updateExpr) => {
+  const updateParams = prepareQueryObj("", "", tableName, "", key, "", expAttributeValues, updateExpr, "", "ALL_NEW");
+  await call('update', updateParams);
+};

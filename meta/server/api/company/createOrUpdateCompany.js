@@ -4,7 +4,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
-import { fetchData, scanAndUpdate } from "../../helper/helper";
+import { fetchData, queryData, updateItem } from "../../helper/helper";
 export const handler = async (event, context, callback) => {
   try {
     const claims = getClaims(event);
@@ -74,12 +74,98 @@ const updateCompany = async (postData, tableName) => {
     { "PK": constants.COMPANY_HASH, "SK": constants.COMPANY_HASH + postData.companyId },
     tableName
   );
+  if (oldCompanyData.companyName !== postData.companyName) {
+    await queryAndUpdate(postData.companyId, tableName, postData.companyName);
+  }
   const updateExpression = "Set companyId=:companyId, companyName =:companyName, mainContactUserIds =:mainContactUserIds";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateCompanyParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
   const companyData = await call('update', updateCompanyParams);
-  if (oldCompanyData.companyName !== postData.companyName) {
-    await scanAndUpdate({ companyId: postData.companyId }, tableName, { companyName: postData.companyName });
-  }
   return companyData;
+};
+
+const queryAndUpdate = async (companyId, tableName, companyName) => {
+  const indexName = constants.GLOBAL_INDEX_GSI1;
+  let lastEvaluatedKey;
+  let devAlreadyUpdate={};
+  do {
+    const expAttrValues = {
+      ':GSI1PK': constants.COMPANY_HASH + companyId
+    };
+    const keyCondExp = 'GSI1PK=:GSI1PK';
+    const { Items, LastEvaluatedKey } = await queryData(tableName, indexName, expAttrValues, keyCondExp, lastEvaluatedKey);
+    lastEvaluatedKey = LastEvaluatedKey;
+    // itemList = itemList.concat(Items);
+    Promise.all(Items && Items.length && Items.map(async item => {
+      if(!devAlreadyUpdate[item.deviceId]){
+        devAlreadyUpdate[item.deviceId] = true;
+        await queryAndUpdateCam(item.deviceId, tableName, companyName);
+      }
+      const expAttributeValues = {
+        ":companyName": companyName
+      };
+      const key = {
+        "PK": item.PK,
+        "SK": item.SK
+      };
+      const updateExpression = "Set companyName =:companyName";
+      await updateItem(tableName, key, expAttributeValues, updateExpression);
+    }));
+  } while (typeof lastEvaluatedKey != "undefined");
+};
+
+const queryAndUpdateCam = async (deviceId, tableName, companyName) => {
+  const indexName = constants.GLOBAL_INDEX_GSI1;
+  let lastEvaluatedKey;
+  // let itemList = [];
+  let camVisAlreadyUpdated = {};
+  do {
+    const expAttrValues = {
+      ':GSI1PK': constants.DEVICE_HASH + deviceId
+    };
+    const keyCondExp = 'GSI1PK=:GSI1PK';
+    const { Items, LastEvaluatedKey } = await queryData(tableName, indexName, expAttrValues, keyCondExp, lastEvaluatedKey);
+    lastEvaluatedKey = LastEvaluatedKey;
+    // itemList = itemList.concat(Items);
+    Promise.all(Items && Items.length && Items.map(async item => {
+      if(!camVisAlreadyUpdated[item.cameraId]){
+        camVisAlreadyUpdated[item.cameraId] = true;
+        await queryAndUpdateCamVisibility(item.cameraId, tableName, companyName);
+      }
+      const expAttributeValues = {
+        ":companyName": companyName
+      };
+      const key = {
+        "PK": item.PK,
+        "SK": item.SK
+      };
+      const updateExpression = "Set companyName =:companyName";
+      await updateItem(tableName, key, expAttributeValues, updateExpression);
+    }));
+  } while (typeof lastEvaluatedKey != "undefined");
+};
+const queryAndUpdateCamVisibility = async (cameraId, tableName, companyName) => {
+  const indexName = constants.GLOBAL_INDEX_GSI1;
+  let lastEvaluatedKey;
+  // let itemList = [];
+  do {
+    const expAttrValues = {
+      ':GSI1PK': constants.CAMERA_HASH + cameraId
+    };
+    const keyCondExp = 'GSI1PK=:GSI1PK';
+    const { Items, LastEvaluatedKey } = await queryData(tableName, indexName, expAttrValues, keyCondExp, lastEvaluatedKey);
+    lastEvaluatedKey = LastEvaluatedKey;
+    // itemList = itemList.concat(Items);
+    Promise.all(Items && Items.length && Items.map(async item => {
+      const expAttributeValues = {
+        ":companyName": companyName
+      };
+      const key = {
+        "PK": item.PK,
+        "SK": item.SK
+      };
+      const updateExpression = "Set companyName =:companyName";
+      await updateItem(tableName, key, expAttributeValues, updateExpression);
+    }));
+  } while (typeof lastEvaluatedKey != "undefined");
 };

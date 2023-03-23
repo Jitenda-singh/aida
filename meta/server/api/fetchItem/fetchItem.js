@@ -58,7 +58,7 @@ const fetchUserData = async (claims, isAdminUser, isNormalUser, id, tableName, q
       return failure(httpConstants.STATUS_401, constants.DEFAULT_MESSAGE_UNAUTHORIZED_USER);
     let expAttrValues = {};
     let keyCondExp = '';
-    const indexName = "GSI1";
+    const indexName = constants.GLOBAL_INDEX_GSI1;
     if (queryStringParam && queryStringParam.cameraId) {
       expAttrValues[':GSI1PK'] = constants.CAMERA_HASH + queryStringParam.cameraId;
       keyCondExp = 'GSI1PK=:GSI1PK';
@@ -121,7 +121,7 @@ const fetchCameraData = async (claims, isAdminUser, isNormalUser, id, tableName,
       return failure(httpConstants.STATUS_401, constants.DEFAULT_MESSAGE_UNAUTHORIZED_USER);
     let expAttrValues = {};
     let keyCondExp = '';
-    const indexName = "GSI1";
+    const indexName = constants.GLOBAL_INDEX_GSI1;
     if (queryStringParam && queryStringParam.deviceId) {
       expAttrValues[':GSI1PK'] = constants.DEVICE_HASH + queryStringParam.deviceId;
       keyCondExp = 'GSI1PK=:GSI1PK';

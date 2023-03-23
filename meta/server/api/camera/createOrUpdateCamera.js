@@ -4,7 +4,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
-import { fetchData, scanAndUpdate } from "../../helper/helper";
+import { fetchData, queryData, updateItem } from "../../helper/helper";
 export const handler = async (event, context, callback) => {
   try {
     const claims = getClaims(event);
@@ -96,12 +96,38 @@ const updateCamera = async (postData, tableName) => {
     { "PK": constants.CAMERA_HASH, "SK": constants.CAMERA_HASH + postData.cameraId },
     tableName
   );
+  if (oldCameraData.cameraName !== postData.cameraName) {
+    await queryAndUpdate(postData.cameraId, tableName, postData.cameraName);
+  }
   const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, deviceName=:deviceName, companyId =:companyId, companyName=:companyName, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateCameraParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
   const cameraData = await call('update', updateCameraParams);
-  if (oldCameraData.cameraName !== postData.cameraName) {
-    await scanAndUpdate({ cameraId: postData.cameraId }, tableName, { cameraName: postData.cameraName });
-  }
   return cameraData;
+};
+
+const queryAndUpdate = async (cameraId, tableName, cameraName) => {
+  const indexName = constants.GLOBAL_INDEX_GSI1;
+  let lastEvaluatedKey;
+  // let itemList = [];
+  do {
+    const expAttrValues = {
+      ':GSI1PK': constants.CAMERA_HASH + cameraId
+    };
+    const keyCondExp = 'GSI1PK=:GSI1PK';
+    const { Items, LastEvaluatedKey } = await queryData(tableName, indexName, expAttrValues, keyCondExp, lastEvaluatedKey);
+    lastEvaluatedKey = LastEvaluatedKey;
+    // itemList = itemList.concat(Items);
+    Promise.all(Items && Items.length && Items.map(async item => {
+      const expAttributeValues = {
+        ":cameraName": cameraName
+      };
+      const key = {
+        "PK": item.PK,
+        "SK": item.SK
+      };
+      const updateExpression = "Set cameraName =:cameraName";
+      await updateItem(tableName, key, expAttributeValues, updateExpression);
+    }));
+  } while (typeof lastEvaluatedKey != "undefined");
 };
