@@ -4,7 +4,7 @@ import { v4 as uuidV4 } from 'uuid';
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
-import { fetchData, queryData, updateItem } from "../../helper/helper";
+import { fetchAll, fetchData, updateItem } from "../../helper/helper";
 export const handler = async (event, context, callback) => {
   try {
     const claims = getClaims(event);
@@ -97,7 +97,7 @@ const updateCamera = async (postData, tableName) => {
     tableName
   );
   if (oldCameraData.cameraName !== postData.cameraName) {
-    await queryAndUpdate(postData.cameraId, tableName, postData.cameraName);
+    await updateCameraNameInCameraVisibility(postData.cameraId, tableName, postData.cameraName);
   }
   const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, deviceName=:deviceName, companyId =:companyId, companyName=:companyName, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
@@ -106,28 +106,24 @@ const updateCamera = async (postData, tableName) => {
   return cameraData;
 };
 
-const queryAndUpdate = async (cameraId, tableName, cameraName) => {
+const updateCameraNameInCameraVisibility = async (cameraId, tableName, cameraName) => {
   const indexName = constants.GLOBAL_INDEX_GSI1;
-  let lastEvaluatedKey;
   // let itemList = [];
-  do {
-    const expAttrValues = {
-      ':GSI1PK': constants.CAMERA_HASH + cameraId
+  const expAttrValues = {
+    ':GSI1PK': constants.CAMERA_HASH + cameraId
+  };
+  const keyCondExp = 'GSI1PK=:GSI1PK';
+  let getObj = prepareQueryObj("", "", tableName, indexName, "", "", expAttrValues, "", "", "", keyCondExp);
+  let cameraVisList = await fetchAll(getObj);
+  Promise.all(cameraVisList && cameraVisList.length && cameraVisList.map(async item => {
+    const expAttributeValues = {
+      ":cameraName": cameraName
     };
-    const keyCondExp = 'GSI1PK=:GSI1PK';
-    const { Items, LastEvaluatedKey } = await queryData(tableName, indexName, expAttrValues, keyCondExp, lastEvaluatedKey);
-    lastEvaluatedKey = LastEvaluatedKey;
-    // itemList = itemList.concat(Items);
-    Promise.all(Items && Items.length && Items.map(async item => {
-      const expAttributeValues = {
-        ":cameraName": cameraName
-      };
-      const key = {
-        "PK": item.PK,
-        "SK": item.SK
-      };
-      const updateExpression = "Set cameraName =:cameraName";
-      await updateItem(tableName, key, expAttributeValues, updateExpression);
-    }));
-  } while (typeof lastEvaluatedKey != "undefined");
+    const key = {
+      "PK": item.PK,
+      "SK": item.SK
+    };
+    const updateExpression = "Set cameraName =:cameraName";
+    await updateItem(tableName, key, expAttributeValues, updateExpression);
+  }));
 };
