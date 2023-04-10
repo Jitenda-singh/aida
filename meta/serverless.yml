@@ -33,6 +33,10 @@ provider:
   environment:
     PROJECT_NAME: ${self:provider.projectName}
     STAGE: ${self:provider.stage}
+    REGION: ${self:provider.region}
+    ACCOUNT: ${aws:accountId}
+    USER_POOL_ID: !ImportValue ${self:provider.projectName}-${self:provider.stage}-poolId
+    APP_CLIENT_ID: !Ref userPoolClient
   iamRoleStatements:
     - Effect: Allow
       Action: "cognito-idp:*"

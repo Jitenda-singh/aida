@@ -15,6 +15,7 @@ const Camera = React.lazy(() => import('./components/camera/Camera'))
 const CameraVisibility = React.lazy(() => import('./components/camera/CameraVisibility'))
 const View1 = React.lazy(() => import('./components/view/View1'))
 const View2 = React.lazy(() => import('./components/view/View2'))
+const KVSPlayer = React.lazy(() => import('./components/view/KVSPlayer'))
 
 function AppRouter() {
   const { isAuthenticated, userData } = useSelector((state) => state.user)
@@ -37,7 +38,9 @@ function AppRouter() {
             <Route path='/device' element={<PrivateAppRouter isAuthenticated={isAuthenticated && isAdminUser} element={Device} />} />
             <Route path='/camera-visibility' element={<PrivateAppRouter isAuthenticated={isAuthenticated && isAdminUser} element={CameraVisibility} />} />
             <Route path='/view1' element={<PrivateAppRouter isAuthenticated={isAuthenticated} element={View1} />} />
-            <Route path='/view2' element={<PrivateAppRouter isAuthenticated={isAuthenticated && isNormalUser} element={View2} />} />
+            <Route path='/view2' element={<PrivateAppRouter isAuthenticated={isAuthenticated && isNormalUser} element={View2} />}>
+              <Route path=':id' element={<PrivateAppRouter isAuthenticated={isAuthenticated && isNormalUser} element={View2} />} />
+            </Route>
           </Route>
         </Routes>
       </Router>
