@@ -139,7 +139,6 @@ function CameraDrawer(props) {
 const DeviceItemList = (props) => {
   const { deviceList, cameraList } = props
   const classes = useStyles()
-  console.log("deviceList==>", deviceList)
   return (
     deviceList && Object.keys(deviceList).length ? Object.keys(deviceList).map((devId, index) =>
       <>
