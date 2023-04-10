@@ -33,7 +33,6 @@ public class Main {
     public static void main(String[] args) throws Exception {
         // Set up credentials provider and Kinesis Video client
         AWSCredentialsProvider credentialsProvider = DefaultAWSCredentialsProviderChain.getInstance();
-//        BasicAWSCredentials credentials = new BasicAWSCredentials("AKIA2DPPZ4LEXJXTOXMX", "0aPVIKFwaXzxDZEX0an+ldsZaW+Gn9gLqndHT8Dq");
         System.out.println("credentialsProvider..."+ credentialsProvider);
         AmazonKinesisVideo kinesisVideoClient = AmazonKinesisVideoClientBuilder.standard()
                 .withCredentials(credentialsProvider)
