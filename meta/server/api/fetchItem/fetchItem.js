@@ -3,7 +3,8 @@ import { getClaims } from "../../libs/auth-lib";
 import { httpConstants } from "../../constants/httpConstants";
 import { getTableName } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
-import { fetchData, queryData } from "../../helper/helper";
+import { fetchData, getStreamSessionURL, queryData } from "../../helper/helper";
+import { kinesisvideo } from "../../libs/cognito-lib";
 
 
 export const handler = async (event, context, callback) => {
@@ -36,6 +37,9 @@ export const handler = async (event, context, callback) => {
           break;
         case constants.CAMERA_VISIBILITY_KEYWORD:
           result = await fetchCameraVisibilityData(claims, isAdminUser, isNormalUser, itemId, tableName, queryStringParam);
+          break;
+        case constants.VIDEO_STREAM_KEYWORD:
+          result = await fetchVideoLink(claims, isAdminUser, isNormalUser, itemId, tableName, queryStringParam);
           break;
         default:
           break;
@@ -225,4 +229,42 @@ const fetchCameraVisibilityData = async (claims, isAdminUser, isNormalUser, id, 
     delete object['GSI1SK'];
   });
   return cameraVisibilityData;
+};
+
+const fetchVideoLink = async (claims, isAdminUser, isNormalUser, id, tableName, queryStringParam) => {
+  const userGroupInfo = (claims && Object.keys(claims) && Object.keys(claims).length > 0 && claims["cognito:groups"] && claims["cognito:groups"].length > 0 && claims["cognito:groups"]);
+  const isCameraAccessible = userGroupInfo && userGroupInfo.length && userGroupInfo.includes(`${constants.CAMERA_HASH}${id}`);
+  if (!isNormalUser || !isCameraAccessible)
+    return failure(httpConstants.STATUS_401, constants.DEFAULT_MESSAGE_UNAUTHORIZED_USER);
+
+  const cameraData = await fetchData(
+    { "PK": constants.CAMERA_HASH, "SK": constants.CAMERA_HASH + id },
+    tableName
+  );
+  const options = {
+    // ON_DEMAND - media playlist is typically static for sessions, LIVE - media playlist is continually updated with new fragments for sessions
+    PlaybackMode: constants.KVS_PLAYBACK_MODE_LIVE,
+    // NEVER /ALWAYS
+    DisplayFragmentTimestamp: constants.KVS_DISPLAY_FRAGMENT_TIMESTAMP_ALWAYS,
+    // how much time link is valid in seconds, this value can be between 300 (5 minutes) and 43200 (12 hours).
+    Expires: constants.KVS_LINKS_EXPIRE_DURATION_600, // 10 min
+    // FRAGMENTED_MP4 - container format packages the media into MP4 fragments, MPEG_TS - only supported packaging on older HLS players, has a 5-25 % consts more
+    ContainerFormat: constants.KVS_CONTAINER_FORMAT_MP4,
+    // ALWAYS - recommended to use if fragment timestamps are not accurate,and server timestamp is selected, NEVER - option for producer timestamp, ON_DISCONTINUITY - adviced option for most cases, media player timeline is only reset when there is a significant issue with the media timeline (e.g. a missing fragment)
+    DiscontinuityMode: constants.KVS_DISCONTINUITY_MODE_ALWAYS,
+    HLSFragmentSelector: {
+      // PRODUCER_TIMESTAMP, SERVER_TIMESTAMP
+      FragmentSelectorType: constants.KVS_SERVER_TIMESTAMP,
+    },
+  };
+  const endpointObject = await kinesisvideo.getDataEndpoint({
+    StreamName: cameraData.streamId,
+    APIName: constants.KVS_API_NAME,
+  }).promise();
+
+  const data = {
+    //get stream session url, url is valid from 5 min to 12 h. depending on hereabove options
+    url: await getStreamSessionURL(endpointObject.DataEndpoint, cameraData.streamId, options),
+  };
+  return data;
 };

@@ -1,7 +1,10 @@
 import { constants } from "../constants/constants";
 import { httpConstants } from "../constants/httpConstants";
+import { cognitoClient } from "../libs/cognito-lib";
+// import { cognitoClient } from "../libs/cognito-lib";
 import { call, prepareQueryObj } from "../libs/dynamodb-lib";
 import { failure } from "../libs/response-lib";
+import AWS from 'aws-sdk';
 
 export const fetchData = async (key, tableName) => {
   let getParams = prepareQueryObj("", "", tableName, "", key);
@@ -94,4 +97,29 @@ export const fetchAll = async (getObj) => {
     list = list.concat(Items);
   } while (typeof lastEvaluatedKey != "undefined");
   return list;
+};
+
+export const createGroup = async (groupName, roleArn) => {
+  const params = {
+    GroupName: groupName, /* required */
+    UserPoolId: process.env.USER_POOL_ID, /* required */
+    RoleArn: roleArn
+    // Description: 'STRING_VALUE',
+    // Precedence: 'NUMBER_VALUE',
+  };
+  const data = await cognitoClient.createGroup(params);
+  return data;
+};
+export const getStreamSessionURL = async (endpoint, streamName, options) => {
+  // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/KinesisVideoArchivedMedia.html
+  const kinesisVideoArchivedMedia = new AWS.KinesisVideoArchivedMedia({
+    endpoint: new AWS.Endpoint(endpoint)
+  });
+
+  // get HLSS sourse of the stream as will use HLSS player. Other option is DASH - getDASHStreamingSessionURL
+  const data = await kinesisVideoArchivedMedia.getHLSStreamingSessionURL({
+    StreamName: streamName,
+    ...options,
+  }).promise();
+  return data.HLSStreamingSessionURL;
 };

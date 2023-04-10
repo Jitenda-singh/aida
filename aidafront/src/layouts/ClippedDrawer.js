@@ -68,7 +68,7 @@ export default function ClippedDrawer() {
   const [isView2, setIsView2] = React.useState(false)
   let location = useLocation();
   React.useEffect(() => {
-    setIsView2(location.pathname === "/view2")
+    setIsView2(location.pathname.includes("/view2"))
   }, [location])
   return (
     <Drawer

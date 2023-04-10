@@ -4,7 +4,8 @@ import { v4 as uuidV4 } from 'uuid';
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
-import { fetchAll, fetchData, updateItem } from "../../helper/helper";
+import { createGroup, fetchAll, fetchData, updateItem } from "../../helper/helper";
+import { createPolicy, createRole } from "../../helper/roleHelper";
 export const handler = async (event, context, callback) => {
   try {
     const claims = getClaims(event);
@@ -61,6 +62,13 @@ const createCamera = async (postData, tableName) => {
   };
   const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, deviceName=:deviceName, companyId =:companyId, companyName=:companyName, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const createCameraParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, "", "UPDATED_NEW");
+  try {
+    await createPolicy(postData.streamId);
+    const iamRoleArn = await createRole(postData.streamId);
+    await createGroup(constants.CAMERA_HASH + cameraId, iamRoleArn);
+  } catch (e) {
+    console.log("error", e);
+  }
   return await call('update', createCameraParams);
 };
 
@@ -102,6 +110,13 @@ const updateCamera = async (postData, tableName) => {
   const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, deviceName=:deviceName, companyId =:companyId, companyName=:companyName, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateCameraParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
+  try {
+    await createPolicy(postData.streamId);
+    const iamRoleArn = await createRole(postData.streamId);
+    await createGroup(constants.CAMERA_HASH + postData.cameraId, iamRoleArn);
+  } catch (e) {
+    console.log("error", e);
+  }
   const cameraData = await call('update', updateCameraParams);
   return cameraData;
 };

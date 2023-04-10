@@ -6,6 +6,7 @@ import ListItemText from '@mui/material/ListItemText'
 import Typography from '@mui/material/Typography'
 import { get } from '../utils/httpHelper'
 import constants from '../constants/constants'
+import { NavLink } from 'react-router-dom'
 const useStyles = makeStyles({
   root: {
     display: 'flex',
@@ -57,6 +58,15 @@ const useStyles = makeStyles({
     fontSize: "14px !important",
     float: 'left',
     paddingLeft: "12px"
+  },
+  navLink: {
+    width: '100%',
+    textDecoration: 'none',
+    backgroundColor: 'white',
+    color: '#0d52a1',
+    '& .MuiListItemButton-root': {
+      paddingLeft: '24px'
+    }
   }
 })
 function CameraDrawer(props) {
@@ -151,9 +161,17 @@ const CameraItemList = (props) => {
     cameraList && Object.keys(cameraList).length ? Object.keys(cameraList).map((camId, index) =>
       <>
         <ListItem key={camId} className={classes.camDrawerListItem} >
-          <ListItemButton className={classes.camListItemButton}>
-            <ListItemText primary={<span className={'cameraMenu'}>{cameraList[camId]}</span>} />
-          </ListItemButton>
+          <NavLink isActive={(match) => {
+            if (!match) {
+              return false
+            }
+            const eventID = parseInt(match.params.eventID)
+            return !isNaN(eventID) && eventID % 2 === 1
+          }} to={`/view2/${camId}`} className={classes.navLink}>
+            <ListItemButton className={classes.camListItemButton}>
+              <ListItemText primary={<span className={'cameraMenu'}>{cameraList[camId]}</span>} />
+            </ListItemButton>
+          </NavLink>
         </ListItem>
       </>
     ) : <Typography className={classes.textStyle}>No Camera</Typography>

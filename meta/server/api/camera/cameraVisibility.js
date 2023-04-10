@@ -3,6 +3,7 @@ import { getClaims } from "../../libs/auth-lib";
 import { httpConstants } from "../../constants/httpConstants";
 import { call, getTableName, prepareQueryObj } from "../../libs/dynamodb-lib";
 import { constants } from "../../constants/constants";
+import { cognitoClient } from "../../libs/cognito-lib";
 export const handler = async (event, context, callback) => {
   try {
     const claims = getClaims(event);
@@ -52,9 +53,18 @@ const createCameraVisibility = async (postData, tableName) => {
     "SK": constants.CAMERA_HASH + postData.cameraId,
   };
   const createCameraVisibilityParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, "", "ALL_NEW");
+  await addUserToGroup(postData.userId, constants.CAMERA_HASH + postData.cameraId);
   return await call('update', createCameraVisibilityParams);
 };
 
+const addUserToGroup = async (userName, groupName) => {
+  let userData = {
+    UserPoolId: process.env.USER_POOL_ID,
+    Username: userName,
+    GroupName: groupName
+  };
+  return await cognitoClient.adminAddUserToGroup(userData).promise();
+};
 // const updateCameraVisibility = async (postData, tableName) => {
 //   if (!(
 
