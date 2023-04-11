@@ -53,6 +53,12 @@ provider:
         - dynamodb:Query
         - dynamodb:Scan
       Resource: !Sub arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${DataTable}/index/*
+    - Effect: Allow
+      Action:
+        - kinesisvideo:GetDataEndpoint
+        - kinesisvideo:GetMedia
+        - kinesisvideo:GetHLSStreamingSessionURL
+      Resource: !Sub arn:aws:kinesisvideo:${self:provider.region}:${AWS::AccountId}:stream/*/*
 custom:
   outputToEnv:
     fileName: ../${self:provider.frontendDirectoryName}/.env
