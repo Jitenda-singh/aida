@@ -39,7 +39,7 @@ export const createRole = async (streamARN) => {
   } catch (err) {
     if(err.code === "EntityAlreadyExists"){
       return `arn:aws:iam::${process.env.ACCOUNT}:role/${streamName}-role`;
-    }
+    } else throw err;
   }
 };
 
@@ -72,6 +72,6 @@ export const createPolicy = async (streamARN) => {
   } catch(e){
     if(e.code === "EntityAlreadyExists"){
       return `arn:aws:iam::${process.env.ACCOUNT}:policy/${streamName}-policy`;
-    }
+    } else throw  e;
   }
 };
