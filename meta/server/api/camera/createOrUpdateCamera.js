@@ -62,13 +62,9 @@ const createCamera = async (postData, tableName) => {
   };
   const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, deviceName=:deviceName, companyId =:companyId, companyName=:companyName, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const createCameraParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, "", "UPDATED_NEW");
-  try {
-    await createPolicy(postData.streamId);
-    const iamRoleArn = await createRole(postData.streamId);
-    await createGroup(constants.CAMERA_HASH + cameraId, iamRoleArn);
-  } catch (e) {
-    console.log("error", e);
-  }
+  await createPolicy(postData.streamId);
+  const iamRoleArn = await createRole(postData.streamId);
+  await createGroup(constants.CAMERA_HASH + cameraId, iamRoleArn);
   return await call('update', createCameraParams);
 };
 
@@ -110,13 +106,9 @@ const updateCamera = async (postData, tableName) => {
   const updateExpression = "Set cameraId =:cameraId, deviceId =:deviceId, deviceName=:deviceName, companyId =:companyId, companyName=:companyName, cameraName =:cameraName, streamId =:streamId, GSI1PK =:GSI1PK, GSI1SK =:GSI1SK";
   const conditionExp = "attribute_exists(PK) and attribute_exists(SK)";
   const updateCameraParams = prepareQueryObj("", "", tableName, "", key, "", expressionAttributeValues, updateExpression, conditionExp, "ALL_NEW");
-  try {
-    await createPolicy(postData.streamId);
-    const iamRoleArn = await createRole(postData.streamId);
-    await createGroup(constants.CAMERA_HASH + postData.cameraId, iamRoleArn);
-  } catch (e) {
-    console.log("error", e);
-  }
+  await createPolicy(postData.streamId);
+  const iamRoleArn = await createRole(postData.streamId);
+  await createGroup(constants.CAMERA_HASH + postData.cameraId, iamRoleArn);
   const cameraData = await call('update', updateCameraParams);
   return cameraData;
 };

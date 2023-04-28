@@ -2,7 +2,9 @@ const AWS = require('aws-sdk');
 
 const iam = new AWS.IAM();
 // Create IAM Role
-export const createRole = async (streamName) => {
+export const createRole = async (streamARN) => {
+  const arnArray  = streamARN.split('/');
+  const streamName = arnArray.slice(-2).join('-');
   const assumeRolePolicyDocument = JSON.stringify({
     Version: '2012-10-17',
     Statement: [
@@ -43,7 +45,9 @@ export const createRole = async (streamName) => {
 
 
 // Create IAM Policy
-export const createPolicy = async (streamName) => {
+export const createPolicy = async (streamARN) => {
+  const arnArray  = streamARN.split('/');
+  const streamName = arnArray.slice(-2).join('-');
   const params = {
     PolicyDocument: JSON.stringify({
       Version: '2012-10-17',
@@ -54,7 +58,8 @@ export const createPolicy = async (streamName) => {
             "kinesisvideo:GetDataEndpoint",
             "kinesisvideo:GetMedia"
           ],
-          Resource: `arn:aws:kinesisvideo:${process.env.REGION}:${process.env.ACCOUNT}:stream/${streamName}/*`
+          Resource: streamARN
+          // Resource: `arn:aws:kinesisvideo:${process.env.REGION}:${process.env.ACCOUNT}:stream/${streamName}/*`
         }
       ]
     }),
