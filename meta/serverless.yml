@@ -59,6 +59,13 @@ provider:
         - kinesisvideo:GetMedia
         - kinesisvideo:GetHLSStreamingSessionURL
       Resource: !Sub arn:aws:kinesisvideo:${self:provider.region}:${AWS::AccountId}:stream/*/*
+    - Effect": Allow
+      Action:
+        - iam:AttachRolePolicy
+        - iam:CreateRole
+        - iam:CreatePolicy
+        - iam:PutRolePolicy
+      Resource: !Sub arn:aws:sts::${AWS::AccountId}:assumed-role/${self:service}-${self:provider.stage}-${self:provider.region}-lambdaRole/${self:service}-${self:provider.stage}-createOrUpdateCamera
 custom:
   outputToEnv:
     fileName: ../${self:provider.frontendDirectoryName}/.env
