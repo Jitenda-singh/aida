@@ -59,7 +59,7 @@ provider:
         - kinesisvideo:GetMedia
         - kinesisvideo:GetHLSStreamingSessionURL
       Resource: !Sub arn:aws:kinesisvideo:${self:provider.region}:${AWS::AccountId}:stream/*/*
-    - Effect": Allow
+    - Effect: Allow
       Action:
         - iam:AttachRolePolicy
         - iam:CreateRole
