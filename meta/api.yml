@@ -14,9 +14,6 @@ user:
             Ref: ApiGatewayAuthorizer
 createOrUpdateUsers:
   handler: server/api/users/createOrUpdateUsers.handler
-  environment:
-    USER_POOL_ID: !ImportValue ${self:provider.projectName}-${self:provider.stage}-poolId
-    APP_CLIENT_ID: !Ref userPoolClient
   events:
     - http:
         path: /users

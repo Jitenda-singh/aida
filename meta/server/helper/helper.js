@@ -99,18 +99,23 @@ export const fetchAll = async (getObj) => {
   return list;
 };
 
-export const createGroup = async (groupName, roleArn) => {
+export const createGroup = async (groupName) => {
   const params = {
     GroupName: groupName, /* required */
     UserPoolId: process.env.USER_POOL_ID, /* required */
-    RoleArn: roleArn
-    // Description: 'STRING_VALUE',
+    Description: `AIDA ${groupName} group`,
+    // RoleArn: roleArn
     // Precedence: 'NUMBER_VALUE',
   };
-  const data = await cognitoClient.createGroup(params);
-  return data;
+  cognitoClient.createGroup(params, function (err, data) {
+    if (err) {
+      throw err;
+    } else {
+      return data;
+    }
+  });
 };
-export const getStreamSessionURL = async (endpoint, streamName, options) => {
+export const getStreamSessionURL = async (endpoint, StreamARN, options) => {
   // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/KinesisVideoArchivedMedia.html
   const kinesisVideoArchivedMedia = new AWS.KinesisVideoArchivedMedia({
     endpoint: new AWS.Endpoint(endpoint)
@@ -118,7 +123,7 @@ export const getStreamSessionURL = async (endpoint, streamName, options) => {
 
   // get HLSS sourse of the stream as will use HLSS player. Other option is DASH - getDASHStreamingSessionURL
   const data = await kinesisVideoArchivedMedia.getHLSStreamingSessionURL({
-    StreamName: streamName,
+    StreamARN: StreamARN,
     ...options,
   }).promise();
   return data.HLSStreamingSessionURL;
