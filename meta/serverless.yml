@@ -35,7 +35,7 @@ provider:
     STAGE: ${self:provider.stage}
     REGION: ${self:provider.region}
     ACCOUNT: ${aws:accountId}
-    USER_POOL_ID: !ImportValue ${self:provider.projectName}-${self:provider.stage}-poolId
+    USER_POOL_ID: !Ref userPool
     APP_CLIENT_ID: !Ref userPoolClient
   iamRoleStatements:
     - Effect: Allow
@@ -59,13 +59,6 @@ provider:
         - kinesisvideo:GetMedia
         - kinesisvideo:GetHLSStreamingSessionURL
       Resource: !Sub arn:aws:kinesisvideo:${self:provider.region}:${AWS::AccountId}:stream/*/*
-    - Effect: Allow
-      Action:
-        - iam:AttachRolePolicy
-        - iam:CreateRole
-        - iam:CreatePolicy
-        - iam:PutRolePolicy
-      Resource: !Sub arn:aws:sts::${AWS::AccountId}:assumed-role/${self:service}-${self:provider.stage}-${self:provider.region}-lambdaRole/${self:service}-${self:provider.stage}-createOrUpdateCamera
 custom:
   outputToEnv:
     fileName: ../${self:provider.frontendDirectoryName}/.env

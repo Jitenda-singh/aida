@@ -258,10 +258,10 @@ const fetchVideoLink = async (claims, isAdminUser, isNormalUser, id, tableName, 
     },
   };
   const endpointObject = await kinesisvideo.getDataEndpoint({
-    StreamName: cameraData.streamId,
+    // StreamName: cameraData.streamId,
+    StreamARN: cameraData.streamId,
     APIName: constants.KVS_API_NAME,
   }).promise();
-
   const data = {
     //get stream session url, url is valid from 5 min to 12 h. depending on hereabove options
     url: await getStreamSessionURL(endpointObject.DataEndpoint, cameraData.streamId, options),

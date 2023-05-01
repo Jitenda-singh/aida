@@ -3,6 +3,11 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub ${self:provider.projectName}-${self:provider.stage}-front
+      PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: ObjectWriter
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
